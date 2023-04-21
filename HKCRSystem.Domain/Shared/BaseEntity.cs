@@ -11,9 +11,9 @@ namespace HKCRSystem.Domain.Shared
         public DateTime CreatedTime { get; set; }
         public DateTime? UpdatedTime { get; set; }
         public DateTime? DeletedTime { get; set; }
-        public int CreatedBy { get; set; }
-        public int UpdatedBy { get; set; }
-        public int DeletedBy { get; set; }
+        public Guid CreatedBy { get; set; }
+        public Guid UpdatedBy { get; set; }
+        public Guid DeletedBy { get; set; }
         public bool IsDeleted { get; set; }
     }
 }
