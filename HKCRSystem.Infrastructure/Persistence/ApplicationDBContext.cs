@@ -15,7 +15,7 @@ namespace HKCRSystem.Infrastructure.Persistence
     {
         public readonly IDateTime _dateTime;
 
-        public ApplicationDBContext(DbContextOptions<ApplicationDBContext> options, IDateTime dateTime)
+        public ApplicationDBContext(DbContextOptions<ApplicationDBContext> options, IDateTime dateTime) : base(options)
         {
             _dateTime = dateTime;
         }
