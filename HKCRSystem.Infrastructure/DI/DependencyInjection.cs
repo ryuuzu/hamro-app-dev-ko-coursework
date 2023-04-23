@@ -1,4 +1,5 @@
 ﻿using HKCRSystem.Application.Common.Interface;
+using HKCRSystem.Domain.Entities;
 using HKCRSystem.Infrastructure.Persistence;
 using HKCRSystem.Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
@@ -22,7 +23,7 @@ namespace HKCRSystem.Infrastructure.DI
                 b => b.MigrationsAssembly(typeof(ApplicationDBContext).Assembly.FullName)),
                 ServiceLifetime.Transient);
 
-            services.AddIdentityCore<IdentityUser>(options =>
+            services.AddIdentityCore<ApplicationUser>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = true;
                 options.Password.RequireDigit = false;
@@ -32,7 +33,8 @@ namespace HKCRSystem.Infrastructure.DI
             services.AddScoped<IApplicationDBContext>(provider => (IApplicationDBContext)provider.GetServices<ApplicationDBContext>());
             // Add Services here.
             services.AddTransient<IDateTime, DateTimeService>();
-            //services.AddTransient<IAuthentication, AuthenticationService>();
+            services.AddTransient<IUserAuthentication, UserAuthenticationService>();
+
             return services;
         }
     }

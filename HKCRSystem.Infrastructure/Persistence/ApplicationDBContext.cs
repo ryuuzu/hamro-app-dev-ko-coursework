@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace HKCRSystem.Infrastructure.Persistence
 {
-    public class ApplicationDBContext : IdentityDbContext<IdentityUser, IdentityRole, string>, IApplicationDBContext
+    public class ApplicationDBContext : IdentityDbContext<ApplicationUser, IdentityRole, string>, IApplicationDBContext
     {
         public readonly IDateTime _dateTime;
 
