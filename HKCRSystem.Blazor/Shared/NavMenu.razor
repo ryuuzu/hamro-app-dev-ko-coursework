@@ -1,39 +1,15 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">HKCRSystem.Blazor</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-</div>
+﻿
+<MudNavMenu>
+    <MudNavLink Icon="@Icons.Material.Filled.Dashboard" Href="/" Match="NavLinkMatch.All">Dashboard</MudNavLink>
+    <MudNavLink Icon="@Icons.Material.Rounded.PersonPin" Href="customers" Match="NavLinkMatch.Prefix">Customers</MudNavLink>
+    <MudNavLink Icon="@Icons.Material.Filled.PersonAdd" Href="staff" Match="NavLinkMatch.Prefix">Staff</MudNavLink>
+    <MudNavLink Icon="@Icons.Material.Filled.CarRental" Href="car" Match="NavLinkMatch.Prefix">Car</MudNavLink>
+    <MudNavLink Icon="@Icons.Material.Filled.LocalOffer" Href="offers" Match="NavLinkMatch.Prefix">Offers</MudNavLink>
+    <MudNavLink Icon="@Icons.Material.Filled.CarCrash" Href="damage" Match="NavLinkMatch.Prefix">Damage</MudNavLink>
+    <MudNavLink Icon="@Icons.Material.Filled.Receipt" Href="billing" Match="NavLinkMatch.Prefix">Billing</MudNavLink>
+    <MudNavGroup Icon="@Icons.Material.Filled.Settings" Title="Setting" Expanded="true">
+        <MudNavLink Icon="@Icons.Material.Rounded.Person" Href="user" Match="NavLinkMatch.Prefix">Users</MudNavLink>
+        <MudNavLink Icon="@Icons.Material.Filled.Lock" Href="changePassword" Match="NavLinkMatch.Prefix">Change Password</MudNavLink>
+    </MudNavGroup>
+</MudNavMenu>
 
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
-            </NavLink>
-        </div>
-    </nav>
-</div>
-
-@code {
-    private bool collapseNavMenu = true;
-
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-}
