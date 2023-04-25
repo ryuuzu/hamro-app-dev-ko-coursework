@@ -10,5 +10,6 @@ namespace HKCRSystem.Application.Common.Interface
     public interface IUserAuthentication
     {
         Task<ResponseDTO> Register(UserRegisterRequestDTO model);
+        Task<ResponseDTO> Login(UserLoginRequestDTO model);
     }
 }
