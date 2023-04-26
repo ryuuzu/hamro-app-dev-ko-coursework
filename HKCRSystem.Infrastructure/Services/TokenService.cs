@@ -10,6 +10,7 @@ using HKCRSystem.Application.Common.Interface;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Configuration;
 using HKCRSystem.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace HKCRSystem.Infrastructure.Services
 {
@@ -27,7 +28,7 @@ namespace HKCRSystem.Infrastructure.Services
         }
 
 
-        public string GenerateToken(ApplicationUser user)
+        public string GenerateToken(ApplicationUser user, string role)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_key);
@@ -36,6 +37,7 @@ namespace HKCRSystem.Infrastructure.Services
                 Subject = new ClaimsIdentity(new[] {
                      new Claim(ClaimTypes.NameIdentifier, user.Id),
                      new Claim(ClaimTypes.Email, user.Email),
+                     new Claim(ClaimTypes.Role, role),
                  }),
                 Expires = DateTime.UtcNow.AddHours(12),
                 Issuer = _issuer,

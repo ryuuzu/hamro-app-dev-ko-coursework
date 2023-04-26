@@ -8,6 +8,6 @@ using System.Threading.Tasks;
 namespace HKCRSystem.Application.Common.Interface
 {    public interface ITokenService
     {
-        string GenerateToken(ApplicationUser user);
+        string GenerateToken(ApplicationUser user, string role);
     }
 }

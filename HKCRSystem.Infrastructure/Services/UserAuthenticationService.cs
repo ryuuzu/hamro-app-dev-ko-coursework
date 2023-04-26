@@ -36,10 +36,15 @@ namespace HKCRSystem.Infrastructure.Services
                 SecurityStamp = Guid.NewGuid().ToString(),
                 UserName = model.Username,
                 PhoneNumber = model.PhoneNumber,
-                Address = model.Address
+                Address = model.Address,
+                EmailConfirmed = true
             };
 
             var result = await _userManager.CreateAsync(user, model.Password);
+
+            //saving user as customer
+            await _userManager.AddToRoleAsync(user, "Customer");
+
 
             if (!result.Succeeded)
                 return
@@ -64,7 +69,11 @@ namespace HKCRSystem.Infrastructure.Services
 
             var user = await _userManager.FindByNameAsync(model.Username);
 
-            return new ResponseDTO { Status = "Success", Message = _tokenService.GenerateToken(user) };
+            //gets the user role
+            var roles = await _userManager.GetRolesAsync(user);
+            var role = roles.FirstOrDefault();
+
+            return new ResponseDTO { Status = "Success", Message = _tokenService.GenerateToken(user, role) };
 
         }
     }
