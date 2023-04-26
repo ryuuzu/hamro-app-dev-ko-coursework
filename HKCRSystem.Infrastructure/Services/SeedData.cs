@@ -33,6 +33,8 @@ namespace HKCRSystem.Infrastructure.Services
             // Create admin user
             ApplicationUser adminUser = new()
             {
+                FirstName = "Hkcr",
+                LastName = "Admin",
                 UserName = "hkcr_admin",
                 Email = "hkcr_admin@gmail.com",
                 EmailConfirmed = true

@@ -26,7 +26,7 @@ namespace HKCRSystem.Infrastructure.Services
 
         public async Task<ResponseDTO> Register(UserRegisterRequestDTO model)
         {
-            var userExists = await _userManager.FindByNameAsync(model.Username);
+            var userExists = await _userManager.FindByEmailAsync(model.Email);
             if (userExists != null)
                 return new ResponseDTO { Status = "Error", Message = "User already exists!" };
 
@@ -34,7 +34,9 @@ namespace HKCRSystem.Infrastructure.Services
             {
                 Email = model.Email,
                 SecurityStamp = Guid.NewGuid().ToString(),
-                UserName = model.Username,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                UserName = model.FirstName.ToLower(),
                 PhoneNumber = model.PhoneNumber,
                 Address = model.Address,
                 EmailConfirmed = true
@@ -56,23 +58,37 @@ namespace HKCRSystem.Infrastructure.Services
 
         public async Task<ResponseDTO> Login(UserLoginRequestDTO model)
         {
-            var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, true, false);
+            //finds user by email
+            var user = await _userManager.FindByEmailAsync(model.Email);
 
-            if (!result.Succeeded)
+            //returns error message if user not found
+            if (user == null)
             {
                 return new ResponseDTO()
                 {
-                    Message = "Invalid username or password!",
+                    Message = "Invalid email or password!",
                     Status = "Error"
                 };
             }
 
-            var user = await _userManager.FindByNameAsync(model.Username);
+            //validates email and password
+            var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
+
+            //returns error if invalid
+            if (!result.Succeeded)
+            {
+                return new ResponseDTO()
+                {
+                    Message = "Invalid email or password!",
+                    Status = "Error"
+                };
+            }
 
             //gets the user role
             var roles = await _userManager.GetRolesAsync(user);
             var role = roles.FirstOrDefault();
 
+            //retruns success message with token
             return new ResponseDTO { Status = "Success", Message = _tokenService.GenerateToken(user, role) };
 
         }
