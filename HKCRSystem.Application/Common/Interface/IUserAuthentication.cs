@@ -1,4 +1,5 @@
 ﻿using HKCRSystem.Application.DTOs;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +12,8 @@ namespace HKCRSystem.Application.Common.Interface
     {
         Task<ResponseDTO> Register(UserRegisterRequestDTO model);
         Task<ResponseDTO> Login(UserLoginRequestDTO model);
+        Task<ResponseDTO> PasswordChange(string email, ChangePasswordDTO model);
+        Task ForgotPassword(ResetPasswordDTO model);
+        Task ResetPassword(ResetPasswordConfirmDTO model);
     }
 }

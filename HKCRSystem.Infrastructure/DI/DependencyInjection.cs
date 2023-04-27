@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HKCRSystem.Infrastructure.Email;
 
 namespace HKCRSystem.Infrastructure.DI
 {
@@ -21,6 +22,10 @@ namespace HKCRSystem.Infrastructure.DI
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
+            //gets the jwt config and secret key from appsettings
+            var jwtConfig = configuration.GetSection("Jwt");
+            var secretKey = jwtConfig["Key"];
+            
             services.AddDbContext<ApplicationDBContext>(
                 options => options.UseNpgsql(configuration.GetConnectionString("HKCRDatabase"),
                 b => b.MigrationsAssembly(typeof(ApplicationDBContext).Assembly.FullName)),
@@ -31,26 +36,18 @@ namespace HKCRSystem.Infrastructure.DI
                 options.Password.RequireDigit = false;
                 options.Password.RequiredLength = 5;
             })
-                .AddEntityFrameworkStores<ApplicationDBContext>();
+                .AddEntityFrameworkStores<ApplicationDBContext>()
+                .AddDefaultTokenProviders()
+                .AddTokenProvider<DataProtectorTokenProvider<ApplicationUser>>(TokenOptions.DefaultProvider);
 
-
-            services.AddScoped<IApplicationDBContext>(provider => provider.GetService<ApplicationDBContext>());
-
-            // Add Services here.
-            services.AddTransient<IDateTime, DateTimeService>();
-            services.AddTransient<IUserAuthentication, UserAuthenticationService>();
-            services.AddTransient<ITokenService, TokenService>();
-
-            return services;
-        }
-        public static void ConfigureJWT(this IServiceCollection services, IConfiguration configuration)
-        {
-            var jwtConfig = configuration.GetSection("Jwt");
-            var secretKey = jwtConfig["Key"];
-            services.AddAuthentication(opt =>
+            //validates token for 10 hours
+            services.Configure<DataProtectionTokenProviderOptions>(options => options.TokenLifespan = TimeSpan.FromHours(10));
+            
+            //adding authentication
+            services.AddAuthentication(options =>
             {
-                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
                 .AddJwtBearer(options =>
                 {
@@ -65,6 +62,17 @@ namespace HKCRSystem.Infrastructure.DI
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
                     };
                 });
+
+            services.AddScoped<IApplicationDBContext>(provider => provider.GetService<ApplicationDBContext>());
+
+            // Add Services here.
+            services.AddTransient<IDateTime, DateTimeService>();
+            services.AddTransient<IUserAuthentication, UserAuthenticationService>();
+            services.AddTransient<ITokenService, TokenService>();
+            services.AddTransient<IEmailService, EmailService>();
+            services.AddTransient<IGmailEmailProvider, GmailEmailProvider>();
+
+            return services;
         }
     }
 }

@@ -3,6 +3,9 @@ using HKCRSystem.Application.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http;
+using System.Security.Claims;
 
 namespace HKCRSystem.API.Controllers
 {
@@ -31,6 +34,40 @@ namespace HKCRSystem.API.Controllers
         {
             var result = await _authenticationManager.Login(user);
             return result;
+        }
+
+        [HttpPost]
+        [Authorize]
+        [Route("/api/auth/change/password")]
+        public async Task<ResponseDTO> PasswordChange([FromBody] ChangePasswordDTO model)
+        {
+            // Get the JWT token from the Authorization header
+            string authHeader = HttpContext.Request.Headers["Authorization"];
+            string token = authHeader?.Split(' ')[1];
+
+            // Decode the JWT token
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jwtToken = tokenHandler.ReadJwtToken(token);
+
+            // Extract the email address from the JWT token's payload
+            string? email = jwtToken.Claims.FirstOrDefault(c => c.Type == "email")?.Value;
+
+            var result = await _authenticationManager.PasswordChange(email, model);
+            return result;
+        }
+
+        [HttpPost]
+        [Route("/api/auth/forgot/password")]
+        public async Task ForgotPassword([FromBody] ResetPasswordDTO model)
+        {
+            await _authenticationManager.ForgotPassword(model);
+        }
+
+        [HttpPost]
+        [Route("/api/auth/reset/password")]
+        public async Task ResetPassword([FromBody] ResetPasswordConfirmDTO model)
+        {
+            await _authenticationManager.ResetPassword(model);
         }
     }
 }
