@@ -67,6 +67,7 @@ namespace HKCRSystem.Infrastructure.DI
             // Add Services here.
             services.AddTransient<IDateTime, DateTimeService>();
             services.AddTransient<IUserAuthentication, UserAuthenticationService>();
+            services.AddTransient<IHelper, Helper>();
             services.AddTransient<IUserManagement, UserManagementService>();
             services.AddTransient<IOffer, OfferService>();
             services.AddTransient<ITokenService, TokenService>();

@@ -12,7 +12,7 @@ namespace HKCRSystem.Application.Common.Interface
     {
         Task<ResponseDTO> Register(UserRegisterRequestDTO model);
         Task<ResponseDTO> Login(UserLoginRequestDTO model);
-        Task<ResponseDTO> PasswordChange(string email, ChangePasswordDTO model);
+        Task<ResponseDTO> PasswordChange(string id, ChangePasswordDTO model);
         Task ForgotPassword(ResetPasswordDTO model);
         Task ResetPassword(ResetPasswordConfirmDTO model);
     }

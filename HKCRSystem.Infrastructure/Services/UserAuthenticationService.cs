@@ -98,10 +98,10 @@ namespace HKCRSystem.Infrastructure.Services
 
         }
 
-        public async Task<ResponseDTO> PasswordChange(string email, ChangePasswordDTO model)
+        public async Task<ResponseDTO> PasswordChange(string id, ChangePasswordDTO model)
         {
             //gets the user by email
-            var user = await _userManager.FindByEmailAsync(email);
+            var user = await _userManager.FindByIdAsync(id);
 
             //validates presence of email
             if (user == null)

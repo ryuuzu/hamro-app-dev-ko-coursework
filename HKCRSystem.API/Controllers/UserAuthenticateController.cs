@@ -1,11 +1,8 @@
 ﻿using HKCRSystem.Application.Common.Interface;
 using HKCRSystem.Application.DTOs;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
-using System.Security.Claims;
 
 namespace HKCRSystem.API.Controllers
 {
@@ -13,10 +10,12 @@ namespace HKCRSystem.API.Controllers
     public class UserAuthenticateController : ControllerBase
     {
         private readonly IUserAuthentication _authenticationManager;
+        private readonly IHelper _helper;
 
-        public UserAuthenticateController(IUserAuthentication authenticationManager)
+        public UserAuthenticateController(IUserAuthentication authenticationManager, IHelper helper)
         {
             _authenticationManager = authenticationManager;
+            _helper = helper;
         }
 
         [HttpPost]
@@ -41,18 +40,9 @@ namespace HKCRSystem.API.Controllers
         [Route("/api/auth/change/password")]
         public async Task<ResponseDTO> PasswordChange([FromBody] ChangePasswordDTO model)
         {
-            // Get the JWT token from the Authorization header
-            string authHeader = HttpContext.Request.Headers["Authorization"];
-            string token = authHeader?.Split(' ')[1];
-
-            // Decode the JWT token
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var jwtToken = tokenHandler.ReadJwtToken(token);
-
-            // Extract the email address from the JWT token's payload
-            string? email = jwtToken.Claims.FirstOrDefault(c => c.Type == "email")?.Value;
-
-            var result = await _authenticationManager.PasswordChange(email, model);
+            //gets the id from the request header
+            string id = _helper.GetIdFromToken(HttpContext);
+            var result = await _authenticationManager.PasswordChange(id, model);
             return result;
         }
 
