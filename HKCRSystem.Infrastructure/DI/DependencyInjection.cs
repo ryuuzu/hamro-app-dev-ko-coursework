@@ -2,7 +2,6 @@
 using HKCRSystem.Domain.Entities;
 using HKCRSystem.Infrastructure.Persistence;
 using HKCRSystem.Infrastructure.Services;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Identity;
@@ -69,6 +68,7 @@ namespace HKCRSystem.Infrastructure.DI
             services.AddTransient<IDateTime, DateTimeService>();
             services.AddTransient<IUserAuthentication, UserAuthenticationService>();
             services.AddTransient<IUserManagement, UserManagementService>();
+            services.AddTransient<IOffer, OfferService>();
             services.AddTransient<ITokenService, TokenService>();
             services.AddTransient<IEmailService, EmailService>();
             services.AddTransient<IGmailEmailProvider, GmailEmailProvider>();
