@@ -1,5 +1,6 @@
 ﻿using HKCRSystem.Application.Common.Interface;
 using HKCRSystem.Application.DTOs;
+using HKCRSystem.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,25 +12,29 @@ namespace HKCRSystem.API.Controllers
     public class OfferController : ControllerBase
     {
         private readonly IOffer _offer;
+        private readonly IHelper _helper;
 
-        public OfferController(IOffer offer)
+        public OfferController(IOffer offer, IHelper helper)
         {
             _offer = offer;
+            _helper = helper;
         }
 
         [HttpPost]
         [Authorize(Roles = "Admin, Staff")]
-        [Route("/api/user/add/offer")]
+        [Route("/api/add/offer")]
         public async Task<ResponseDTO> CreateOffer([FromBody] OfferRequestDTO model)
         {
-            var result = await _offer.CreateOffer(model);
+            //gets the id from the request header
+            string id = _helper.GetIdFromToken(HttpContext);
+            var result = await _offer.CreateOffer(model, id);
             return result;
         }
 
 
         [HttpGet]
         [Authorize(Roles = "Admin, Staff")]
-        [Route("/api/user/get/offer")]
+        [Route("/api/get/offer")]
         public async Task<List<OfferResponseDTO>> GetAllOffer()
         {
             var result = await _offer.GetAllOffer();
@@ -38,19 +43,23 @@ namespace HKCRSystem.API.Controllers
 
         [HttpPut]
         [Authorize(Roles = "Admin, Staff")]
-        [Route("/api/user/update/offer")]
+        [Route("/api/update/offer")]
         public async Task<ResponseDTO> UpdateOffer(OfferResponseDTO model)
         {
-            var result = await _offer.UpdateOffer(model);
+            //gets the id from the request header
+            string id = _helper.GetIdFromToken(HttpContext);
+            var result = await _offer.UpdateOffer(model, id);
             return result;
         }
 
         [HttpDelete]
         [Authorize(Roles = "Admin, Staff")]
-        [Route("/api/user/delete/offer/{id}")]
-        public async Task<ResponseDTO> DeleteStaff([FromRoute] Guid id)
+        [Route("/api/delete/offer/{id}")]
+        public async Task<ResponseDTO> DeleteOffer([FromRoute] Guid id)
         {
-            var result = await _offer.DeleteOffer(id);
+            //gets the id from the request header
+            string userId = _helper.GetIdFromToken(HttpContext);
+            var result = await _offer.DeleteOffer(id, userId);
             return result;
         }
     }

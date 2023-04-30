@@ -16,6 +16,5 @@ namespace HKCRSystem.Domain.Entities
         public DateTime EndDate { get; set; }
         public string? Type { get; set; }
         public float DiscountPercent { get; set; }
-        public Guid RoleId { get; set; }
     }
 }

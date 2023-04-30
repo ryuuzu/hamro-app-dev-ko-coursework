@@ -9,9 +9,9 @@ namespace HKCRSystem.Application.Common.Interface
 {
     public interface IOffer
     {
-        Task<ResponseDTO> CreateOffer(OfferRequestDTO model);
+        Task<ResponseDTO> CreateOffer(OfferRequestDTO model, string id);
         Task<List<OfferResponseDTO>> GetAllOffer();
-        Task<ResponseDTO> UpdateOffer(OfferResponseDTO model);
-        Task<ResponseDTO> DeleteOffer(Guid id);
+        Task<ResponseDTO> UpdateOffer(OfferResponseDTO model, string id);
+        Task<ResponseDTO> DeleteOffer(Guid id, string userId);
     }
 }

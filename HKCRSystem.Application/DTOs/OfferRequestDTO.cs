@@ -26,8 +26,5 @@ namespace HKCRSystem.Application.DTOs
         
         [Required(ErrorMessage = "Discount percent is required.")]
         public float DiscountPercent { get; set; }
-        
-        [Required(ErrorMessage = "Role is required.")]
-        public Guid RoleId { get; set; }
     }
 }
