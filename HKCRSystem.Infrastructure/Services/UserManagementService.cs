@@ -2,6 +2,7 @@
 using HKCRSystem.Application.DTOs;
 using HKCRSystem.Domain.Entities;
 using HKCRSystem.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -15,10 +16,16 @@ namespace HKCRSystem.Infrastructure.Services
     public class UserManagementService : IUserManagement
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IApplicationDBContext _dbContext;
+        private readonly IUserAuthentication _auth;
+        private readonly IHelper _helper;
 
-        public UserManagementService(UserManager<ApplicationUser> userManager)
+        public UserManagementService(UserManager<ApplicationUser> userManager, IHelper helper, IApplicationDBContext dbContext, IUserAuthentication auth)
         {
             _userManager = userManager;
+            _helper = helper;
+            _dbContext = dbContext;
+            _auth = auth;
         }
 
         public async Task<ResponseDTO> AddStaff(StaffAddRequestDTO model)
@@ -118,7 +125,7 @@ namespace HKCRSystem.Infrastructure.Services
             if (!result.Succeeded)
                 return
                     new ResponseDTO
-                    { Status = "Error", Message = "Staff creation failed! Please check staff details and try again." };
+                    { Status = "Error", Message = "Staff update failed! Please check staff details and try again." };
 
             return new ResponseDTO { Status = "Success", Message = "Staff updated successfully!" };
         }
@@ -141,5 +148,92 @@ namespace HKCRSystem.Infrastructure.Services
             return new ResponseDTO { Status = "Success", Message = "Staff deleted successfully!" };
         }
 
+        public async Task<ResponseDTO> UpdateProfile(ProfileRequestDTO model, IFormFile file)
+        {
+            //gets user by its id
+            var user = await _userManager.FindByIdAsync(model.Id);
+            if (user == null)
+            {
+                return new ResponseDTO { Status = "Error", Message = "User does not exist!" };
+            }
+
+            if (file != null)
+            {
+                // Validate file
+                var validationResult = _helper.ValidateFile(file);
+                if (validationResult.Status == "Error")
+                {
+                    return validationResult;
+                }
+            }
+
+            //update user details
+            user.Email = model.Email;
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+            user.UserName = model.FirstName.ToLower();
+            user.PhoneNumber = model.PhoneNumber;
+            user.Address = model.Address;
+
+            //updates user
+            var result = await _userManager.UpdateAsync(user);
+
+            if (!result.Succeeded)
+                return
+                    new ResponseDTO
+                    { Status = "Error", Message = "Profile update failed! Please check staff details and try again." };
+
+            // Check if attachment exists
+            var attachment = await _dbContext.Attachments.FirstOrDefaultAsync(a => a.UserId == user.Id);
+            if (attachment != null)
+            {
+                // Update existing attachment with new image
+                attachment.Name = Path.GetFileNameWithoutExtension(file.FileName);
+                attachment.Type = model.Type;
+                attachment.Description = model.Description;
+                attachment.Path = Path.Combine("Assest", Guid.NewGuid().ToString() + Path.GetExtension(file.FileName));
+                
+                using (var stream = new FileStream(attachment.Path, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                _dbContext.Attachments.Update(attachment);
+            }
+            else
+            {
+                await _auth.PostAttachment(file, model.Description, model.Type, model.Id);
+            }
+
+            await _dbContext.SaveChangesAsync(default(CancellationToken));
+
+            return new ResponseDTO { Status = "Success", Message = "Profile updated successfully!" };
+        }
+
+        public async Task<List<CustomerResponseDTO>> GetAllCustomer()
+        {
+            //gets the user
+            var users = await _userManager.Users.ToListAsync();
+            var userViewModel = new List<CustomerResponseDTO>();
+            //iterates through all user
+            foreach (ApplicationUser user in users)
+            {
+                var thisViewModel = new CustomerResponseDTO();
+                //gets the role of user
+                var role = await GetUserRoles(user);
+                //checks if user is customer or not, if no adds user detail
+                if (role == "Customer")
+                {
+                    thisViewModel.Id = user.Id;
+                    thisViewModel.FirstName = user.FirstName;
+                    thisViewModel.Email = user.Email;
+                    thisViewModel.LastName = user.LastName;
+                    thisViewModel.Address = user.Address;
+                    thisViewModel.PhoneNumber = user.PhoneNumber;
+                    userViewModel.Add(thisViewModel);
+                }
+            }
+            return userViewModel;
+        }
     }
 }

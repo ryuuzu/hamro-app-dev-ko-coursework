@@ -27,5 +27,9 @@ namespace HKCRSystem.Application.DTOs
 
         [Required(ErrorMessage = "Password is required")]
         public string? Password { get; set; }
+
+        //for attachment
+        public string? Description { get; set; }
+        public string? Type { get; set; }
     }
 }

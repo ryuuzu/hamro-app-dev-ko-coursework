@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using HKCRSystem.Application.DTOs;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +11,6 @@ namespace HKCRSystem.Application.Common.Interface
     public interface IHelper
     {
         string GetIdFromToken(HttpContext context);
+        ResponseDTO ValidateFile(IFormFile file);
     }
 }

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -23,14 +24,16 @@ namespace HKCRSystem.Infrastructure.Services
         private readonly ITokenService _tokenService;
         private readonly IEmailService _emailService;
         private readonly IApplicationDBContext _dbContext;
+        private readonly IHelper _helper;
 
-        public UserAuthenticationService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ITokenService tokenService, IEmailService emailService, IApplicationDBContext dbContext)
+        public UserAuthenticationService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ITokenService tokenService, IEmailService emailService, IApplicationDBContext dbContext, IHelper helper)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _tokenService = tokenService;
             _emailService = emailService;
             _dbContext = dbContext;
+            _helper = helper;
         }
 
         public async Task<ResponseDTO> Register(UserRegisterRequestDTO model, IFormFile file)
@@ -41,18 +44,12 @@ namespace HKCRSystem.Infrastructure.Services
 
             if (file != null)
             {
-                //system supported file format
-                List<string> supportTypes = new List<string> { ".pdf", ".png" };
-
-                //gets the extension of file
-                var path = Path.GetExtension(file.FileName);
-                //checks if file matches with supported files
-                if (!supportTypes.Contains(path))
-                    return new ResponseDTO { Status = "Error", Message = "File should be of pdf or png format!" };
-
-                //checks if file size is greater than 1.5MB
-                if (file.Length > 1.5 * 1024 * 1024)
-                    return new ResponseDTO { Status = "Error", Message = "File size should not exceed 1.5 MB!" };
+                // Validate file
+                var validationResult = _helper.ValidateFile(file);
+                if (validationResult.Status == "Error")
+                {
+                    return validationResult;
+                }
             }
 
             ApplicationUser user = new()
@@ -75,8 +72,9 @@ namespace HKCRSystem.Infrastructure.Services
             // Check if image is null
             if (file != null)
             {
+                var userDetail = await _userManager.FindByEmailAsync(model.Email);
                 //saves the file
-                await PostAttachment(file);
+                await PostAttachment(file, model.Description, model.Type, userDetail.Id);
             }
 
             if (!result.Succeeded)
@@ -87,12 +85,15 @@ namespace HKCRSystem.Infrastructure.Services
             return new ResponseDTO { Status = "Success", Message = "User created successfully!" };
         }
 
-        public async Task PostAttachment(IFormFile file)
+        public async Task PostAttachment(IFormFile file, string description, string type, string id)
         {
             var attachment = new Attachment
             {
                 Name = Path.GetFileNameWithoutExtension(file.FileName),
-                Path = Path.Combine("Assest", Guid.NewGuid().ToString() + Path.GetExtension(file.FileName))
+                Description = description,
+                Type = type,
+                Path = Path.Combine("Assest", Guid.NewGuid().ToString() + Path.GetExtension(file.FileName)),
+                UserId = id
             };
 
             using (var stream = new FileStream(attachment.Path, FileMode.Create))
@@ -102,7 +103,6 @@ namespace HKCRSystem.Infrastructure.Services
 
             _dbContext.Attachments.Add(attachment);
 
-            _dbContext.UserAttachments.Add(new UserAttachment { AttachmentId = attachment.Id });
             await _dbContext.SaveChangesAsync(default(CancellationToken));
         }
 
