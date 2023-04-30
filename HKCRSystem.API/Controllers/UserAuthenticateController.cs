@@ -20,9 +20,9 @@ namespace HKCRSystem.API.Controllers
 
         [HttpPost]
         [Route("/api/auth/register")]
-        public async Task<ResponseDTO> Register([FromBody] UserRegisterRequestDTO model)
+        public async Task<ResponseDTO> Register([FromForm] UserRegisterRequestDTO model, IFormFile file)
         {
-            var result = await _authenticationManager.Register(model);
+            var result = await _authenticationManager.Register(model, file);
             return result;
         }
 

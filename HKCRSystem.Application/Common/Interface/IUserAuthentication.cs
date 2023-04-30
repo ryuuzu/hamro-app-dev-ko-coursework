@@ -10,7 +10,7 @@ namespace HKCRSystem.Application.Common.Interface
 {
     public interface IUserAuthentication
     {
-        Task<ResponseDTO> Register(UserRegisterRequestDTO model);
+        Task<ResponseDTO> Register(UserRegisterRequestDTO model, IFormFile file);
         Task<ResponseDTO> Login(UserLoginRequestDTO model);
         Task<ResponseDTO> PasswordChange(string id, ChangePasswordDTO model);
         Task ForgotPassword(ResetPasswordDTO model);

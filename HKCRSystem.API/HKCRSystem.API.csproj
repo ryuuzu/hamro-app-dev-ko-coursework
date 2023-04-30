@@ -20,4 +20,8 @@
     <ProjectReference Include="..\HKCRSystem.Infrastructure\HKCRSystem.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Assest\" />
+  </ItemGroup>
+
 </Project>

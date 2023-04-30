@@ -5,12 +5,14 @@ using HKCRSystem.Infrastructure.Email;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace HKCRSystem.Infrastructure.Services
 {
@@ -20,20 +22,38 @@ namespace HKCRSystem.Infrastructure.Services
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ITokenService _tokenService;
         private readonly IEmailService _emailService;
+        private readonly IApplicationDBContext _dbContext;
 
-        public UserAuthenticationService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ITokenService tokenService, IEmailService emailService)
+        public UserAuthenticationService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ITokenService tokenService, IEmailService emailService, IApplicationDBContext dbContext)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _tokenService = tokenService;
             _emailService = emailService;
+            _dbContext = dbContext;
         }
 
-        public async Task<ResponseDTO> Register(UserRegisterRequestDTO model)
+        public async Task<ResponseDTO> Register(UserRegisterRequestDTO model, IFormFile file)
         {
             var userExists = await _userManager.FindByEmailAsync(model.Email);
             if (userExists != null)
                 return new ResponseDTO { Status = "Error", Message = "User already exists!" };
+
+            if (file != null)
+            {
+                //system supported file format
+                List<string> supportTypes = new List<string> { ".pdf", ".png" };
+
+                //gets the extension of file
+                var path = Path.GetExtension(file.FileName);
+                //checks if file matches with supported files
+                if (!supportTypes.Contains(path))
+                    return new ResponseDTO { Status = "Error", Message = "File should be of pdf or png format!" };
+
+                //checks if file size is greater than 1.5MB
+                if (file.Length > 1.5 * 1024 * 1024)
+                    return new ResponseDTO { Status = "Error", Message = "File size should not exceed 1.5 MB!" };
+            }
 
             ApplicationUser user = new()
             {
@@ -52,6 +72,12 @@ namespace HKCRSystem.Infrastructure.Services
             //saving user as customer
             await _userManager.AddToRoleAsync(user, "Customer");
 
+            // Check if image is null
+            if (file != null)
+            {
+                //saves the file
+                await PostAttachment(file);
+            }
 
             if (!result.Succeeded)
                 return
@@ -59,6 +85,25 @@ namespace HKCRSystem.Infrastructure.Services
                     { Status = "Error", Message = "User creation failed! Please check user details and try again." };
 
             return new ResponseDTO { Status = "Success", Message = "User created successfully!" };
+        }
+
+        public async Task PostAttachment(IFormFile file)
+        {
+            var attachment = new Attachment
+            {
+                Name = Path.GetFileNameWithoutExtension(file.FileName),
+                Path = Path.Combine("Assest", Guid.NewGuid().ToString() + Path.GetExtension(file.FileName))
+            };
+
+            using (var stream = new FileStream(attachment.Path, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            _dbContext.Attachments.Add(attachment);
+
+            _dbContext.UserAttachments.Add(new UserAttachment { AttachmentId = attachment.Id });
+            await _dbContext.SaveChangesAsync(default(CancellationToken));
         }
 
         public async Task<ResponseDTO> Login(UserLoginRequestDTO model)
