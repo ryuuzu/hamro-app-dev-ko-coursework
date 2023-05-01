@@ -57,7 +57,9 @@ namespace HKCRSystem.Infrastructure.Services
             if (!result.Succeeded)
                 return
                     new ResponseDTO
-                    { Status = "Error", Message = "Staff creation failed! Please check staff details and try again." };
+                    {
+                        Status = "Error", Message = "Staff creation failed! Please check staff details and try again."
+                    };
 
             return new ResponseDTO { Status = "Success", Message = "Staff created successfully!" };
         }
@@ -86,6 +88,7 @@ namespace HKCRSystem.Infrastructure.Services
                     userRolesViewModel.Add(thisViewModel);
                 }
             }
+
             return userRolesViewModel;
         }
 
@@ -143,11 +146,10 @@ namespace HKCRSystem.Infrastructure.Services
             if (!result.Succeeded)
                 return
                     new ResponseDTO
-                    { Status = "Error", Message = "Staff deletion failed!" };
+                        { Status = "Error", Message = "Staff deletion failed!" };
 
             return new ResponseDTO { Status = "Success", Message = "Staff deleted successfully!" };
         }
-
         public async Task<ResponseDTO> UpdateProfile(ProfileRequestDTO model, IFormFile file)
         {
             //gets user by its id
