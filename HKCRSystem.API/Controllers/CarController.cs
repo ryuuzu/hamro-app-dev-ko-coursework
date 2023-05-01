@@ -32,9 +32,8 @@ namespace HKCRSystem.API.Controllers
 
 
         [HttpGet]
-        [Authorize(Roles = "Admin, Staff")]
         [Route("/api/get/car")]
-        public async Task<List<CarResponseDTO>> GetAllOffer()
+        public async Task<List<CarResponseDTO>> GetAllCar()
         {
             var result = await _car.GetAllCar();
             return result;
