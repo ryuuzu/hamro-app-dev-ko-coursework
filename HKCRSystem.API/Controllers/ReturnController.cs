@@ -32,6 +32,7 @@ namespace HKCRSystem.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin, Staff")]
         [Route("/api/get/return-car")]
         public async Task<List<ReturnResponseDTO>> GetAllReturn()
         {

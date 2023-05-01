@@ -31,6 +31,8 @@ public class RequestService : IRequest
 
         request.ApprovedById = ApprovedById;
         request.IsApproved = true;
+        
+        await _dbContext.SaveChangesAsync(default(CancellationToken));
 
         return new ResponseDTO
         {
@@ -52,6 +54,8 @@ public class RequestService : IRequest
         }
 
         request.ApprovedById = ApprovedById;
+
+        await _dbContext.SaveChangesAsync(default(CancellationToken));
 
         return new ResponseDTO
         {
@@ -165,11 +169,12 @@ public class RequestService : IRequest
             Discount = discount,
             RequestedCarId = model.RequestedCarId,
             RequestedById = UserId,
-            ApprovedById = "",
+            ApprovedById = UserId,
             BillingId = billingEntity.Entity.Id
         };
 
-        await _dbContext.Requests.AddAsync(request);
+        var result = await _dbContext.Requests.AddAsync(request);
+        await _dbContext.SaveChangesAsync(default(CancellationToken));
 
         return new ResponseDTO
         {
@@ -200,6 +205,8 @@ public class RequestService : IRequest
         }
 
         request.IsCancelled = true;
+
+        await _dbContext.SaveChangesAsync(default(CancellationToken));
 
         return new ResponseDTO
         {
