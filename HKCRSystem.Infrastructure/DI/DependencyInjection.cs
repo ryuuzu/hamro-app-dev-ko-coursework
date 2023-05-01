@@ -75,6 +75,7 @@ namespace HKCRSystem.Infrastructure.DI
             services.AddTransient<IOffer, OfferService>();
             services.AddTransient<IBilling, BillingService>();
             services.AddTransient<ICarManagement, CarManagementService>();
+            services.AddTransient<IReturn, ReturnService>();
             services.AddTransient<ITokenService, TokenService>();
             services.AddTransient<IEmailService, EmailService>();
             services.AddTransient<IGmailEmailProvider, GmailEmailProvider>();
