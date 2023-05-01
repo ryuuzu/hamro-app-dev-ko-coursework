@@ -51,5 +51,23 @@ namespace HKCRSystem.API.Controllers
             var result = await _userManagement.DeleteStaff(id);
             return result;
         }
+
+        [HttpPut]
+        [Authorize]
+        [Route("/api/user/update/profile")]
+        public async Task<ResponseDTO> UpdateProfile([FromForm] ProfileRequestDTO model, IFormFile file)
+        {
+            var result = await _userManagement.UpdateProfile(model, file);
+            return result;
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin, Staff")]
+        [Route("/api/user/get/customer")]
+        public async Task<List<CustomerResponseDTO>> GetAllCustomer()
+        {
+            var result = await _userManagement.GetAllCustomer();
+            return result;
+        }
     }
 }
