@@ -95,7 +95,7 @@ namespace HKCRSystem.Infrastructure.Services
         public async Task<ResponseDTO> UpdateStaff(StaffResponseDTO model)
         {
             //gets user by its id
-            var user = await _userManager.FindByIdAsync(model.Id.ToString());
+            var user = await _userManager.FindByIdAsync(model.Id);
             if (user == null)
             {
                 return new ResponseDTO { Status = "Error", Message = "User does not exist!" };

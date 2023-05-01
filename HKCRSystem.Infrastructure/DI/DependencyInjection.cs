@@ -19,38 +19,35 @@ namespace HKCRSystem.Infrastructure.DI
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddInfrastructure(this IServiceCollection services,
-            IConfiguration configuration)
+        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             //gets the jwt config and secret key from appsettings
             var jwtConfig = configuration.GetSection("Jwt");
             var secretKey = jwtConfig["Key"];
-
+            
             services.AddDbContext<ApplicationDBContext>(
                 options => options.UseNpgsql(configuration.GetConnectionString("HKCRDatabase"),
-                    b => b.MigrationsAssembly(typeof(ApplicationDBContext).Assembly.FullName)),
+                b => b.MigrationsAssembly(typeof(ApplicationDBContext).Assembly.FullName)),
                 ServiceLifetime.Transient);
 
-            services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
-                {
-                    options.SignIn.RequireConfirmedAccount = true;
-                    options.Password.RequireDigit = false;
-                    options.Password.RequiredLength = 5;
-                })
+            services.AddIdentity<ApplicationUser, IdentityRole>(options => {
+                options.SignIn.RequireConfirmedAccount = true;
+                options.Password.RequireDigit = false;
+                options.Password.RequiredLength = 5;
+            })
                 .AddEntityFrameworkStores<ApplicationDBContext>()
                 .AddDefaultTokenProviders()
                 .AddTokenProvider<DataProtectorTokenProvider<ApplicationUser>>(TokenOptions.DefaultProvider);
 
             //validates token for 10 hours
-            services.Configure<DataProtectionTokenProviderOptions>(options =>
-                options.TokenLifespan = TimeSpan.FromHours(10));
-
+            services.Configure<DataProtectionTokenProviderOptions>(options => options.TokenLifespan = TimeSpan.FromHours(10));
+            
             //adding authentication
             services.AddAuthentication(options =>
-                {
-                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                })
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
                 .AddJwtBearer(options =>
                 {
                     options.TokenValidationParameters = new TokenValidationParameters

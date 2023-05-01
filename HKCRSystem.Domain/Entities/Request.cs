@@ -19,13 +19,13 @@ namespace HKCRSystem.Domain.Entities
 
         [ForeignKey("RequestedCar")] public Guid RequestedCarId { get; set; }
         public virtual Car RequestedCar { get; set; }
-        
-        [ForeignKey("RequestedBy")] public Guid RequestedById { get; set; }
+
+        [ForeignKey("RequestedBy")] public string RequestedById { get; set; }
         public virtual ApplicationUser RequestedBy { get; set; }
-        
-        [ForeignKey("ApprovedBy")] public Guid ApprovedById { get; set; }
+
+        [ForeignKey("ApprovedBy")] public string ApprovedById { get; set; }
         public virtual ApplicationUser ApprovedBy { get; set; }
-        
+
         [ForeignKey("Billing")] public Guid BillingId { get; set; }
         public virtual Billing Billing { get; set; }
     }

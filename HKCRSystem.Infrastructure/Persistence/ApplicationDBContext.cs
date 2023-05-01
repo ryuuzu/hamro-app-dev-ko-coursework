@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace HKCRSystem.Infrastructure.Persistence
 {
-    public class ApplicationDBContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>, IApplicationDBContext
+    public class ApplicationDBContext : IdentityDbContext<ApplicationUser, IdentityRole, string>, IApplicationDBContext
     {
         public readonly IDateTime _dateTime;
 
@@ -19,6 +19,7 @@ namespace HKCRSystem.Infrastructure.Persistence
         {
             _dateTime = dateTime;
         }
+
 
         public DbSet<Attachment> Attachments { get; set; }
         public DbSet<Billing> Billings { get; set; }
