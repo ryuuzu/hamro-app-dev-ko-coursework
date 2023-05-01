@@ -25,7 +25,7 @@ namespace HKCRSystem.Infrastructure.Email
             //setting mailtrap 
             _client = new SmtpClient("sandbox.smtp.mailtrap.io", 2525)
             {
-                Credentials = new NetworkCredential("462dd50f879aeb", "ada472221c5d8f"),
+                Credentials = new NetworkCredential("bfc8faa9d3dadc", "ae4f057b38a757"),
                 EnableSsl = true
             };
         }

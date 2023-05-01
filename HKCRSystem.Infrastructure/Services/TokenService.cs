@@ -34,16 +34,17 @@ namespace HKCRSystem.Infrastructure.Services
             var key = Encoding.ASCII.GetBytes(_key);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[] {
-                     new Claim(ClaimTypes.NameIdentifier, user.Id),
-                     new Claim(ClaimTypes.Email, user.Email),
-                     new Claim(ClaimTypes.Role, role),
-                 }),
+                Subject = new ClaimsIdentity(new[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim(ClaimTypes.Role, role),
+                }),
                 Expires = DateTime.UtcNow.AddHours(12),
                 Issuer = _issuer,
                 Audience = _audience,
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
-                SecurityAlgorithms.HmacSha256Signature)
+                    SecurityAlgorithms.HmacSha256Signature)
             };
             var securityToken = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(securityToken);

@@ -50,7 +50,9 @@ namespace HKCRSystem.Infrastructure.Services
             if (!result.Succeeded)
                 return
                     new ResponseDTO
-                    { Status = "Error", Message = "Staff creation failed! Please check staff details and try again." };
+                    {
+                        Status = "Error", Message = "Staff creation failed! Please check staff details and try again."
+                    };
 
             return new ResponseDTO { Status = "Success", Message = "Staff created successfully!" };
         }
@@ -79,6 +81,7 @@ namespace HKCRSystem.Infrastructure.Services
                     userRolesViewModel.Add(thisViewModel);
                 }
             }
+
             return userRolesViewModel;
         }
 
@@ -92,7 +95,7 @@ namespace HKCRSystem.Infrastructure.Services
         public async Task<ResponseDTO> UpdateStaff(StaffResponseDTO model)
         {
             //gets user by its id
-            var user = await _userManager.FindByIdAsync(model.Id);
+            var user = await _userManager.FindByIdAsync(model.Id.ToString());
             if (user == null)
             {
                 return new ResponseDTO { Status = "Error", Message = "User does not exist!" };
@@ -118,7 +121,9 @@ namespace HKCRSystem.Infrastructure.Services
             if (!result.Succeeded)
                 return
                     new ResponseDTO
-                    { Status = "Error", Message = "Staff creation failed! Please check staff details and try again." };
+                    {
+                        Status = "Error", Message = "Staff creation failed! Please check staff details and try again."
+                    };
 
             return new ResponseDTO { Status = "Success", Message = "Staff updated successfully!" };
         }
@@ -136,10 +141,9 @@ namespace HKCRSystem.Infrastructure.Services
             if (!result.Succeeded)
                 return
                     new ResponseDTO
-                    { Status = "Error", Message = "Staff deletion failed!" };
+                        { Status = "Error", Message = "Staff deletion failed!" };
 
             return new ResponseDTO { Status = "Success", Message = "Staff deleted successfully!" };
         }
-
     }
 }
