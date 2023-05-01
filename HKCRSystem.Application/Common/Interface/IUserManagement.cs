@@ -1,4 +1,5 @@
 ﻿using HKCRSystem.Application.DTOs;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,5 +14,7 @@ namespace HKCRSystem.Application.Common.Interface
         Task<List<StaffResponseDTO>> GetAllStaffAsync();
         Task<ResponseDTO> UpdateStaff(StaffResponseDTO model);
         Task<ResponseDTO> DeleteStaff(string id);
+        Task<ResponseDTO> UpdateProfile(ProfileRequestDTO model, IFormFile file);
+        Task<List<CustomerResponseDTO>> GetAllCustomer();
     }
 }

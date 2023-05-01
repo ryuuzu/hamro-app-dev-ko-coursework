@@ -70,6 +70,7 @@ namespace HKCRSystem.Infrastructure.DI
             services.AddTransient<IHelper, Helper>();
             services.AddTransient<IUserManagement, UserManagementService>();
             services.AddTransient<IOffer, OfferService>();
+            services.AddTransient<ICarManagement, CarManagementService>();
             services.AddTransient<ITokenService, TokenService>();
             services.AddTransient<IEmailService, EmailService>();
             services.AddTransient<IGmailEmailProvider, GmailEmailProvider>();

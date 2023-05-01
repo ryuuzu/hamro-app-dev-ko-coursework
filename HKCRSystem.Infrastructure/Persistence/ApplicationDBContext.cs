@@ -28,6 +28,5 @@ namespace HKCRSystem.Infrastructure.Persistence
         public DbSet<Offer> Offers { get; set; }
         public DbSet<Request> Requests { get; set; }
         public DbSet<Return> Returns { get; set; }
-        public DbSet<UserAttachment> UserAttachments { get; set; }
     }
 }
