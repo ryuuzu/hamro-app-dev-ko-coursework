@@ -15,6 +15,7 @@ namespace HKCRSystem.Infrastructure.Services
     public class OfferService : IOffer
     {
         private readonly IApplicationDBContext _dbContext;
+
         public OfferService(IApplicationDBContext dContext)
         {
             _dbContext = dContext;
