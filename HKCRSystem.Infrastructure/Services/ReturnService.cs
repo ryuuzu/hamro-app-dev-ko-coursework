@@ -21,6 +21,17 @@ namespace HKCRSystem.Infrastructure.Services
 
         public async Task<ResponseDTO> CreateReturn(ReturnRequestDTO model, string id)
         {
+            //validating request
+            var request = await _dbContext.Requests.FindAsync(model.RequestId);
+            if (request == null)
+            {
+                return new ResponseDTO
+                {
+                    Status = "Error",
+                    Message = "Request not found"
+                };
+            }
+
             //creates return instance
             var returnDetail = new Return
             {
@@ -41,7 +52,12 @@ namespace HKCRSystem.Infrastructure.Services
         public async Task<List<ReturnResponseDTO>> GetAllReturn()
         {
             //gets the list of return
-            var returns = await _dbContext.Returns.ToListAsync();
+            var returns = await _dbContext.Returns
+                .Include(r => r.AcceptBy)
+                .Include(r => r.Request.RequestedBy)
+                .Include(r => r.Request.RequestedCar)
+                .ToListAsync();
+
             //converts into list of response DTO 
             var returnModel = new List<ReturnResponseDTO>(
                 returns.Select(o => new ReturnResponseDTO
