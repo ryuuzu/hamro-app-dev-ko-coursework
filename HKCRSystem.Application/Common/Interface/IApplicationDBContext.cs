@@ -17,6 +17,7 @@ namespace HKCRSystem.Application.Common.Interface
         DbSet<Offer> Offers { get; set; }
         DbSet<Request> Requests { get; set; }
         DbSet<Return> Returns { get; set; }
+        DbSet<UserAttachment> UserAttachments { get; set; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     }

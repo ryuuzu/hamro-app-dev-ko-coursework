@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -18,10 +17,6 @@
   <ItemGroup>
     <ProjectReference Include="..\HKCRSystem.Application\HKCRSystem.Application.csproj" />
     <ProjectReference Include="..\HKCRSystem.Infrastructure\HKCRSystem.Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Assest\" />
   </ItemGroup>
 
 </Project>
