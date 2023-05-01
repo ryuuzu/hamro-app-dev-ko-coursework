@@ -73,6 +73,7 @@ namespace HKCRSystem.Infrastructure.DI
             services.AddTransient<IHelper, Helper>();
             services.AddTransient<IUserManagement, UserManagementService>();
             services.AddTransient<IOffer, OfferService>();
+            services.AddTransient<IRequest, RequestService>();
             services.AddTransient<IBilling, BillingService>();
             services.AddTransient<ICarManagement, CarManagementService>();
             services.AddTransient<ITokenService, TokenService>();

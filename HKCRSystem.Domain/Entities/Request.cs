@@ -16,6 +16,7 @@ namespace HKCRSystem.Domain.Entities
         public DateTime EndDate { get; set; }
         public float Discount { get; set; }
         public bool IsCancelled { get; set; } = false;
+        public bool IsApproved { get; set; } = false;
 
         [ForeignKey("RequestedCar")] public Guid RequestedCarId { get; set; }
         public virtual Car RequestedCar { get; set; }
