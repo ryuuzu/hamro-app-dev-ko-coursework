@@ -21,7 +21,7 @@ namespace HKCRSystem.Infrastructure.Services
             _dbContext = dContext;
         }
 
-        public async Task<ResponseDTO> CreateOffer(OfferRequestDTO model)
+        public async Task<ResponseDTO> CreateOffer(OfferRequestDTO model, string id)
         {
             //creates Offer instance
             var offerDetail = new Offer
@@ -32,7 +32,8 @@ namespace HKCRSystem.Infrastructure.Services
                 EndDate = model.EndDate,
                 Type = model.Type,
                 DiscountPercent = model.DiscountPercent,
-                RoleId = model.RoleId,
+                CreatedBy = Guid.Parse(id),
+                CreatedTime = DateTime.Now.ToUniversalTime(),
             };
 
             //saves offer data
@@ -46,9 +47,10 @@ namespace HKCRSystem.Infrastructure.Services
         {
             //gets the list of offer
             var offers = await _dbContext.Offers.ToListAsync();
-            //converts into list of response DTO
+            //converts into list of response DTO where non-deleted offers is filtered
             var offerModel = new List<OfferResponseDTO>(
-                offers.Select(o => new OfferResponseDTO
+                offers.Where(o => !o.IsDeleted)
+                .Select(o => new OfferResponseDTO
                 {
                     Id = o.Id,
                     Name = o.Name,
@@ -57,7 +59,7 @@ namespace HKCRSystem.Infrastructure.Services
                     EndDate = o.EndDate,
                     Type = o.Type,
                     DiscountPercent = o.DiscountPercent,
-                    RoleId = o.RoleId
+                    CreatedBy = o.CreatedBy,
                 }).ToList()
             );
 
@@ -65,7 +67,7 @@ namespace HKCRSystem.Infrastructure.Services
             return offerModel;
         }
 
-        public async Task<ResponseDTO> UpdateOffer(OfferResponseDTO model)
+        public async Task<ResponseDTO> UpdateOffer(OfferResponseDTO model, string id)
         {
             //gets offer by its id
             var offer = await _dbContext.Offers.FindAsync(model.Id);
@@ -79,6 +81,8 @@ namespace HKCRSystem.Infrastructure.Services
             offer.EndDate = model.EndDate;
             offer.DiscountPercent = model.DiscountPercent;
             offer.Type = model.Type;
+            offer.UpdatedBy = Guid.Parse(id);
+            offer.UpdatedTime = DateTime.Now.ToUniversalTime();
 
             //updates offer
             await _dbContext.SaveChangesAsync(default(CancellationToken));
@@ -86,15 +90,19 @@ namespace HKCRSystem.Infrastructure.Services
             return new ResponseDTO { Status = "Success", Message = "Offer updated successfully!" };
         }
 
-        public async Task<ResponseDTO> DeleteOffer(Guid id)
+        public async Task<ResponseDTO> DeleteOffer(Guid id, string userId)
         {
             //gets offer by its id
             var offer = await _dbContext.Offers.FindAsync(id);
             if (offer == null)
                 return new ResponseDTO { Status = "Error", Message = "Offer does not exist!" };
 
-            //deletes the offer
-            _dbContext.Offers.Remove(offer);
+            //set new value of offer
+            offer.DeletedBy = Guid.Parse(userId);
+            offer.DeletedTime = DateTime.Now.ToUniversalTime();
+            offer.IsDeleted = true;
+
+            //updates offer
             await _dbContext.SaveChangesAsync(default(CancellationToken));
 
             return new ResponseDTO { Status = "Success", Message = "Offer deleted successfully!" };

@@ -1,4 +1,4 @@
-﻿using HKCRSystem.Application.Common.Interface;
+using HKCRSystem.Application.Common.Interface;
 using HKCRSystem.Domain.Entities;
 using HKCRSystem.Infrastructure.Persistence;
 using HKCRSystem.Infrastructure.Services;
@@ -74,6 +74,7 @@ namespace HKCRSystem.Infrastructure.DI
             services.AddTransient<IUserManagement, UserManagementService>();
             services.AddTransient<IOffer, OfferService>();
             services.AddTransient<IBilling, BillingService>();
+            services.AddTransient<ICarManagement, CarManagementService>();
             services.AddTransient<ITokenService, TokenService>();
             services.AddTransient<IEmailService, EmailService>();
             services.AddTransient<IGmailEmailProvider, GmailEmailProvider>();

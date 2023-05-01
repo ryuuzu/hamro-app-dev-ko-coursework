@@ -15,5 +15,7 @@ namespace HKCRSystem.Application.Common.Interface
         Task<ResponseDTO> PasswordChange(string id, ChangePasswordDTO model);
         Task ForgotPassword(ResetPasswordDTO model);
         Task ResetPassword(ResetPasswordConfirmDTO model);
+        Task PostAttachment(IFormFile file, string description, string type, string id);
+
     }
 }
