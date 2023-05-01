@@ -21,10 +21,12 @@ namespace HKCRSystem.Infrastructure.Services
             {
                 await roleManager.CreateAsync(new IdentityRole("Admin"));
             }
+
             if (!await roleManager.RoleExistsAsync("Staff"))
             {
                 await roleManager.CreateAsync(new IdentityRole("Staff"));
             }
+
             if (!await roleManager.RoleExistsAsync("Customer"))
             {
                 await roleManager.CreateAsync(new IdentityRole("Customer"));
@@ -39,13 +41,49 @@ namespace HKCRSystem.Infrastructure.Services
                 Email = "hkcr_admin@gmail.com",
                 EmailConfirmed = true
             };
-            var adminPassword = "Hkcr1234!";
+            // Create staff user
+            ApplicationUser staffUser = new()
+            {
+                FirstName = "Hkcr",
+                LastName = "Staff",
+                UserName = "hkcr_staff",
+                Email = "hkcr_staff@gmail.com",
+                EmailConfirmed = true
+            };
+            // Create customer user
+            ApplicationUser customerUser = new()
+            {
+                FirstName = "Hkcr",
+                LastName = "Customer",
+                UserName = "hkcr_customer",
+                Email = "hkcr_customer@gmail.com",
+                EmailConfirmed = true
+            };
+            const string password = "Hkcr1234!";
             if (await userManager.FindByEmailAsync(adminUser.Email) == null)
             {
-                var result = await userManager.CreateAsync(adminUser, adminPassword);
+                var result = await userManager.CreateAsync(adminUser, password);
                 if (result.Succeeded)
                 {
                     await userManager.AddToRoleAsync(adminUser, "Admin");
+                }
+            }
+
+            if (await userManager.FindByEmailAsync(staffUser.Email) == null)
+            {
+                var result = await userManager.CreateAsync(staffUser, password);
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(staffUser, "Staff");
+                }
+            }
+
+            if (await userManager.FindByEmailAsync(customerUser.Email) == null)
+            {
+                var result = await userManager.CreateAsync(customerUser, password);
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(customerUser, "Customer");
                 }
             }
         }
