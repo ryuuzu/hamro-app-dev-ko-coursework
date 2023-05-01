@@ -74,7 +74,8 @@ namespace HKCRSystem.Infrastructure.Services
                 //gets the role of user
                 var role = await GetUserRoles(user);
                 //checks if user is customer or not, if no adds user detail
-                if (role != "Customer")
+                //also checks if account status is true
+                if (role != "Customer" && user.EmailConfirmed)
                 {
                     thisViewModel.Id = user.Id;
                     thisViewModel.FirstName = user.FirstName;
@@ -137,9 +138,11 @@ namespace HKCRSystem.Infrastructure.Services
             if (user == null)
                 return new ResponseDTO { Status = "Error", Message = "User does not exist!" };
 
-            //deletes the user
-            var result = await _userManager.DeleteAsync(user);
+            //marks user status as false
+            user.EmailConfirmed = false;
 
+            //updates user
+            var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
                 return
                     new ResponseDTO
@@ -221,8 +224,8 @@ namespace HKCRSystem.Infrastructure.Services
                 var thisViewModel = new CustomerResponseDTO();
                 //gets the role of user
                 var role = await GetUserRoles(user);
-                //checks if user is customer or not, if no adds user detail
-                if (role == "Customer")
+                //checks if user is customer or not and id is activated, if no adds user detail
+                if (role == "Customer" && user.EmailConfirmed)
                 {
                     thisViewModel.Id = user.Id;
                     thisViewModel.FirstName = user.FirstName;
