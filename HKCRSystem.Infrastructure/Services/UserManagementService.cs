@@ -29,7 +29,7 @@ namespace HKCRSystem.Infrastructure.Services
             _auth = auth;
         }
 
-        public async Task<ResponseDTO> AddStaff(StaffAddRequestDTO model)
+        public async Task<ResponseDTO> AddStaff(StaffAddRequestDTO model, string id)
         {
             //checks the existence of user
             var userExists = await _userManager.FindByEmailAsync(model.Email);
@@ -46,7 +46,8 @@ namespace HKCRSystem.Infrastructure.Services
                 UserName = model.FirstName.ToLower(),
                 PhoneNumber = model.PhoneNumber,
                 Address = model.Address,
-                EmailConfirmed = true
+                EmailConfirmed = true,
+                AddedBy = id
             };
 
             //creates user
@@ -65,10 +66,12 @@ namespace HKCRSystem.Infrastructure.Services
             return new ResponseDTO { Status = "Success", Message = "Staff created successfully!" };
         }
 
-        public async Task<List<StaffResponseDTO>> GetAllStaffAsync()
+        public async Task<List<StaffResponseDTO>> GetAllStaffAsync(string id)
         {
-            //gets the user
-            var users = await _userManager.Users.ToListAsync();
+            //gets the user and removes the data of loggedin user
+            var users = await _userManager.Users
+                .Where(u => u.Id != id)
+                .ToListAsync();
             var userRolesViewModel = new List<StaffResponseDTO>();
             //iterates through all user
             foreach (ApplicationUser user in users)
@@ -76,6 +79,7 @@ namespace HKCRSystem.Infrastructure.Services
                 var thisViewModel = new StaffResponseDTO();
                 //gets the role of user
                 var role = await GetUserRoles(user);
+                var addedBy = await _userManager.FindByIdAsync(user.AddedBy);
                 //checks if user is customer or not, if no adds user detail
                 //also checks if account status is true
                 if (role != "Customer" && user.EmailConfirmed)
@@ -87,6 +91,7 @@ namespace HKCRSystem.Infrastructure.Services
                     thisViewModel.Address = user.Address;
                     thisViewModel.PhoneNumber = user.PhoneNumber;
                     thisViewModel.Role = role;
+                    thisViewModel.AddedBy = $"{addedBy?.FirstName} {addedBy?.LastName}";
                     userRolesViewModel.Add(thisViewModel);
                 }
             }
