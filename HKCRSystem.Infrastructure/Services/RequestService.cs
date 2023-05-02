@@ -9,17 +9,23 @@ namespace HKCRSystem.Infrastructure.Services;
 public class RequestService : IRequest
 {
     private readonly IApplicationDBContext _dbContext;
+    private readonly IEmailService _emailService;
     private readonly UserManager<ApplicationUser> _userManager;
 
-    public RequestService(UserManager<ApplicationUser> userManager, IApplicationDBContext dbContext)
+    public RequestService(UserManager<ApplicationUser> userManager, IEmailService emailService,
+        IApplicationDBContext dbContext)
     {
         _dbContext = dbContext;
         _userManager = userManager;
+        _emailService = emailService;
     }
 
     public async Task<ResponseDTO> AcceptRequest(Guid id, string ApprovedById)
     {
-        var request = await _dbContext.Requests.FindAsync(id);
+        var request = (await _dbContext.Requests
+            .Include(r => r.RequestedById)
+            .Include(r => r.RequestedCarId)
+            .ToListAsync()).FirstOrDefault(r => r.Id == id);
         if (request == null)
         {
             return new ResponseDTO
@@ -33,6 +39,12 @@ public class RequestService : IRequest
         request.IsApproved = true;
 
         await _dbContext.SaveChangesAsync(default(CancellationToken));
+
+        await _emailService.SendRequestAcceptedEmailAsync(
+            $"{request.RequestedBy.FirstName} {request.RequestedBy.LastName}",
+            request.RequestedBy.Email,
+            $"{request.RequestedCar.Company} {request.RequestedCar.Model}"
+        );
 
         return new ResponseDTO
         {

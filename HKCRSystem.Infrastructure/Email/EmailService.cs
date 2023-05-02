@@ -38,5 +38,20 @@ namespace HKCRSystem.Infrastructure.Email
             //send the email
             await _emailProvider.SendEmailAsync(message);
         }
+
+        public async Task SendRequestAcceptedEmailAsync(string name, string toEmail, string carName)
+        {
+            //sets the message format
+            var message = new EmailMessage
+            {
+                Subject = "Rent Request Accepted",
+                To = toEmail,
+                Body = @$"Dear {name},
+                     Your rent request for {carName} has been accepted."
+            };
+
+            //send the email
+            await _emailProvider.SendEmailAsync(message);
+        }
     }
 }
