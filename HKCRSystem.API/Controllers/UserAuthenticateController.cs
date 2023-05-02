@@ -59,5 +59,14 @@ namespace HKCRSystem.API.Controllers
         {
             await _authenticationManager.ResetPassword(model);
         }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        [Route("/api/auth/reset/password/admin")]
+        public async Task<ResponseDTO> AdminResetPassword([FromBody] ResetPasswordAdmin model)
+        {
+            var result = await _authenticationManager.ResetPasswordByAdmin(model);
+            return result;
+        }
     }
 }
