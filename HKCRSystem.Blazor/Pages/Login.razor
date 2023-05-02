@@ -1,0 +1,124 @@
+﻿@page "/login"
+
+<PageTitle>Login</PageTitle>
+
+@inherits LayoutComponentBase
+
+@using System.ComponentModel.DataAnnotations
+<PageTitle>Login</PageTitle>
+
+<div class="container-fluid position-relative nav-bar p-0">
+    <div class="position-relative" style="z-index: 9;">
+        <nav class="navbar navbar-expand-lg navbar-dark py-3 py-lg-0 pl-3 pl-lg-5">
+            <a href="" class="navbar-brand">
+                <h1 class="text-uppercase text-dark mb-1">Hamro Car Rental</h1>
+            </a>
+            <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-between px-3" id="navbarCollapse">
+                <div class="navbar-nav ml-auto py-0">
+                    <a href="/" class="nav-item nav-link active">Home</a>
+                    <a href="login" class="nav-item nav-link">Login</a>
+                    <a href="registration" class="nav-item nav-link">Register</a>
+                    <a href="customerrequest" class="nav-item nav-link">Requests</a>
+                    <a href="customerdamage" class="nav-item nav-link">Damages</a>
+                </div>
+
+            </div>
+        </nav>
+    </div>
+
+</div>
+<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+
+    <div class="container">
+
+
+        <!-- Outer Row -->
+        <div class="row justify-content-center">
+
+            <div class="col-xl-10 col-lg-12 col-md-9">
+
+                <div class="card o-hidden border-0 shadow-lg my-5">
+                    <div class="card-body p-0">
+                        <!-- Nested Row within Card Body -->
+                        <div class="row">
+                            <div class="col-lg-6 d-none d-lg-block bg-login">
+                                <img src="./login.png" class="my-3 p-4 img-fluid " style="height: 100%; width: 800px;" />
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="p-3">
+                                    <div class="text-center">
+                                        <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
+                                    </div>
+                                    <MudMainContent>
+                                        <MudContainer MaxWidth="MaxWidth.Medium">
+
+                                            <MudGrid Class="d-flex justify-center">
+                                                <MudItem xs="12" sm="10">
+                                                    <MudCard>
+                                                        <MudCardContent>
+                                                            <h3>Login</h3>
+                                                            <MudTextField Label="Email" Class="mt-3" HelperText="example@gmail.com" Variant="Variant.Outlined"
+                                                                          @bind-Value="model.Email" For="@(() => model.Email)" />
+                                                            <MudTextField Label="Enter Password" HelperText="Enter password" Class="mt-3" Variant="Variant.Outlined"
+                                                                          @bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password" />
+                                                        </MudCardContent>
+                                                        <MudCardActions>
+                                                            <MudButton Variant="Variant.Filled" Color="Color.Dark" Class="mt-4 mx-auto btn btn-primary">Submit</MudButton>
+                                                        </MudCardActions>
+                                                    </MudCard>
+
+                                                </MudItem>
+                                            </MudGrid>
+                                        </MudContainer>
+                                    </MudMainContent>
+                                    <hr>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+   
+
+</EditForm>
+
+
+@code {
+    RegisterAccountForm model = new RegisterAccountForm();
+    bool success;
+
+    public class RegisterAccountForm
+    {
+
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; }
+
+     
+
+        [Required]
+        [StringLength(30, ErrorMessage = "Password must be at least 8 characters long.", MinimumLength = 8)]
+        public string Password { get; set; }
+
+    
+
+    }
+
+    private void OnValidSubmit(EditContext context)
+    {
+        success = true;
+        StateHasChanged();
+    }
+
+
+}
+

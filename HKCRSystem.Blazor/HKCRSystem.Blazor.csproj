@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -7,8 +7,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Pages\Login.razor.css" />
+    <None Remove="Pages\Registration.razor.css" />
+    <None Remove="Pages\Requests - Copy.razor.css" />
+    <None Remove="Pages\Requests.razor.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Pages\Login.razor.css" />
+    <Content Include="Pages\Registration.razor.css" />
+    <Content Include="Pages\Requests.razor.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="bootstrap" Version="5.2.3" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.16" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.16" PrivateAssets="all" />
+    <PackageReference Include="MudBlazor" Version="6.2.2" />
   </ItemGroup>
 
 </Project>

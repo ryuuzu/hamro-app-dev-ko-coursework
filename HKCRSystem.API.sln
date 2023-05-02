@@ -16,6 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HKCRSystem.Blazor", "HKCRSystem.Blazor\HKCRSystem.Blazor.csproj", "{AD64D4F4-191D-4918-B2BE-CA2053C2242E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +40,10 @@ Global
 		{9B0B4135-2FFF-4EAF-8FC8-E9D66AB3E744}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B0B4135-2FFF-4EAF-8FC8-E9D66AB3E744}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9B0B4135-2FFF-4EAF-8FC8-E9D66AB3E744}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD64D4F4-191D-4918-B2BE-CA2053C2242E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD64D4F4-191D-4918-B2BE-CA2053C2242E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD64D4F4-191D-4918-B2BE-CA2053C2242E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD64D4F4-191D-4918-B2BE-CA2053C2242E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
