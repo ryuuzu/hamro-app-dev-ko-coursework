@@ -20,7 +20,8 @@ namespace HKCRSystem.Infrastructure.Services
         private readonly IUserAuthentication _auth;
         private readonly IHelper _helper;
 
-        public UserManagementService(UserManager<ApplicationUser> userManager, IHelper helper, IApplicationDBContext dbContext, IUserAuthentication auth)
+        public UserManagementService(UserManager<ApplicationUser> userManager, IHelper helper,
+            IApplicationDBContext dbContext, IUserAuthentication auth)
         {
             _userManager = userManager;
             _helper = helper;
@@ -129,7 +130,9 @@ namespace HKCRSystem.Infrastructure.Services
             if (!result.Succeeded)
                 return
                     new ResponseDTO
-                    { Status = "Error", Message = "Staff update failed! Please check staff details and try again." };
+                    {
+                        Status = "Error", Message = "Staff update failed! Please check staff details and try again."
+                    };
 
             return new ResponseDTO { Status = "Success", Message = "Staff updated successfully!" };
         }
@@ -153,6 +156,7 @@ namespace HKCRSystem.Infrastructure.Services
 
             return new ResponseDTO { Status = "Success", Message = "Staff deleted successfully!" };
         }
+
         public async Task<ResponseDTO> UpdateProfile(ProfileRequestDTO model, IFormFile file)
         {
             //gets user by its id
@@ -186,7 +190,9 @@ namespace HKCRSystem.Infrastructure.Services
             if (!result.Succeeded)
                 return
                     new ResponseDTO
-                    { Status = "Error", Message = "Profile update failed! Please check staff details and try again." };
+                    {
+                        Status = "Error", Message = "Profile update failed! Please check staff details and try again."
+                    };
 
             // Check if attachment exists
             var attachment = await _dbContext.Attachments.FirstOrDefaultAsync(a => a.UserId == user.Id);
@@ -197,7 +203,7 @@ namespace HKCRSystem.Infrastructure.Services
                 attachment.Type = model.Type;
                 attachment.Description = model.Description;
                 attachment.Path = Path.Combine("Assest", Guid.NewGuid().ToString() + Path.GetExtension(file.FileName));
-                
+
                 using (var stream = new FileStream(attachment.Path, FileMode.Create))
                 {
                     await file.CopyToAsync(stream);
@@ -219,25 +225,42 @@ namespace HKCRSystem.Infrastructure.Services
         {
             //gets the user
             var users = await _userManager.Users.ToListAsync();
+            var requests = await _dbContext.Requests.ToListAsync();
             var userViewModel = new List<CustomerResponseDTO>();
             //iterates through all user
             foreach (ApplicationUser user in users)
             {
-                var thisViewModel = new CustomerResponseDTO();
                 //gets the role of user
                 var role = await GetUserRoles(user);
                 //checks if user is customer or not and id is activated, if no adds user detail
                 if (role == "Customer" && user.EmailConfirmed)
                 {
-                    thisViewModel.Id = user.Id;
-                    thisViewModel.FirstName = user.FirstName;
-                    thisViewModel.Email = user.Email;
-                    thisViewModel.LastName = user.LastName;
-                    thisViewModel.Address = user.Address;
-                    thisViewModel.PhoneNumber = user.PhoneNumber;
+                    var userRequests = requests.Where(r => r.RequestedById == user.Id && r.IsApproved).ToList();
+                    var lastRequest = userRequests.MaxBy(ur => ur.EndDate);
+                    var lastActiveDate = DateTime.Now;
+                    var isInactive = false;
+                    if (lastRequest != null)
+                    {
+                        lastActiveDate = lastRequest.EndDate;
+                        isInactive = (DateTime.Now - lastActiveDate).TotalDays > 90;
+                    }
+
+                    var thisViewModel = new CustomerResponseDTO
+                    {
+                        Id = user.Id,
+                        FirstName = user.FirstName,
+                        Email = user.Email,
+                        LastName = user.LastName,
+                        Address = user.Address,
+                        PhoneNumber = user.PhoneNumber,
+                        TotalRentRecords = userRequests.Count(),
+                        LastActiveDate = lastActiveDate,
+                        IsInactive = isInactive
+                    };
                     userViewModel.Add(thisViewModel);
                 }
             }
+
             return userViewModel;
         }
     }
