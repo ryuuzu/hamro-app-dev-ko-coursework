@@ -14,10 +14,12 @@ namespace HKCRSystem.Infrastructure.Services
     public class CarManagementService : ICarManagement
     {
         private readonly IApplicationDBContext _dbContext;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public CarManagementService(IApplicationDBContext dbContext)
+        public CarManagementService(UserManager<ApplicationUser> userManager, IApplicationDBContext dbContext)
         {
             _dbContext = dbContext;
+            _userManager = userManager;
         }
 
         public async Task<ResponseDTO> CreateCar(CarRequestDTO model, string id)
@@ -29,7 +31,7 @@ namespace HKCRSystem.Infrastructure.Services
                 Model = model.Model,
                 Price = model.Price,
                 Status = model.Status,
-                IsAvailable  = true,
+                IsAvailable = true,
                 CreatedBy = Guid.Parse(id),
                 CreatedTime = DateTime.Now.ToUniversalTime(),
             };
@@ -45,19 +47,29 @@ namespace HKCRSystem.Infrastructure.Services
         {
             //gets the list of car
             var cars = await _dbContext.Cars.ToListAsync();
+            var requests = await _dbContext.Requests.ToListAsync();
+            var users = await _userManager.Users.ToListAsync();
             //converts into list of response DTO where non-deleted cars is filtered
             var carModel = new List<CarResponseDTO>(
                 cars.Where(o => !o.IsDeleted)
-                .Select(o => new CarResponseDTO
-                {
-                    Id = o.Id,
-                    Company = o.Company,
-                    Model = o.Model,
-                    Price = o.Price,
-                    Status = o.Status,
-                    IsAvailable = o.IsAvailable,
-                    CreatedBy = o.CreatedBy,
-                }).ToList()
+                    .Select(o =>
+                    {
+                        var carRequests = requests.Where(cr => cr.IsApproved && cr.RequestedCarId == o.Id);
+                        var enumerable = carRequests as Request[] ?? carRequests.ToArray();
+                        var activeCarRequests =
+                            enumerable.Where(cr => cr.StartDate >= DateTime.Now && cr.EndDate <= DateTime.Now);
+                        return new CarResponseDTO
+                        {
+                            Id = o.Id,
+                            Company = o.Company,
+                            Model = o.Model,
+                            Price = o.Price,
+                            Status = o.Status,
+                            IsAvailable = !activeCarRequests.Any(),
+                            CreatedBy = o.CreatedBy,
+                            TimesRented = enumerable.Length
+                        };
+                    }).ToList()
             );
 
             //returns list
