@@ -116,6 +116,7 @@ public class RequestService : IRequest
     {
         var user = await _userManager.FindByIdAsync(UserId);
         var userAttachment = await _dbContext.Attachments.FindAsync(UserId);
+        var requests = await _dbContext.Requests.ToListAsync();
         var car = await _dbContext.Cars.FindAsync(model.RequestedCarId);
 
         if (userAttachment == null)
@@ -153,7 +154,9 @@ public class RequestService : IRequest
 
         if (_userManager.GetRolesAsync(user).Result.Contains("Customer"))
         {
-            discountPercentage = 10;
+            var userRequests = requests.Where(r => r.RequestedById == user.Id && r.IsApproved).ToList();
+            if (userRequests.Count > 5)
+                discountPercentage = 10;
         }
         else
         {

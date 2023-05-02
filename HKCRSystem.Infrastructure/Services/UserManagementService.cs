@@ -253,7 +253,7 @@ namespace HKCRSystem.Infrastructure.Services
                         LastName = user.LastName,
                         Address = user.Address,
                         PhoneNumber = user.PhoneNumber,
-                        TotalRentRecords = userRequests.Count(),
+                        TotalRentRecords = userRequests.Count,
                         LastActiveDate = lastActiveDate,
                         IsInactive = isInactive
                     };
