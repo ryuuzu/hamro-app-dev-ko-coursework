@@ -9,16 +9,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace HKCRSystem.Infrastructure.Services
 {
     public class OfferService : IOffer
     {
         private readonly IApplicationDBContext _dbContext;
+        private readonly IGmailEmailProvider _gmail;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public OfferService(IApplicationDBContext dContext)
+        public OfferService(IApplicationDBContext dContext, UserManager<ApplicationUser> userManager, IGmailEmailProvider gmail)
         {
             _dbContext = dContext;
+            _userManager = userManager;
+            _gmail = gmail;
         }
 
         public async Task<ResponseDTO> CreateOffer(OfferRequestDTO model, string id)
@@ -40,6 +46,23 @@ namespace HKCRSystem.Infrastructure.Services
             await _dbContext.Offers.AddAsync(offerDetail);
             await _dbContext.SaveChangesAsync(default(CancellationToken));
 
+            //gets the instance of customer
+            var users = await _userManager.GetUsersInRoleAsync("Customer");
+            //gets the email of customer and sets in list
+            var userEmails = users.Select(u => u.Email).ToList();
+            
+            //sets the message format
+            var message = new EmailMessage
+            {
+                Subject = "Offer! Offer!! Offer!!!",
+                To = string.Join(",", userEmails),
+                Body = @$"Dear Valuable User,
+                 We have a new offer for you. {model.Name} offer start from {model.StartDate} and ends on {model.EndDate}. During this offer you can get {model.DiscountPercent}% discount.
+                 Enjoy."
+            };
+            //sends email
+            await _gmail.SendEmailAsync(message);
+
             return new ResponseDTO { Status = "Success", Message = "Offer created successfully." };
         }
 
@@ -47,22 +70,24 @@ namespace HKCRSystem.Infrastructure.Services
         {
             //gets the list of offer
             var offers = await _dbContext.Offers.ToListAsync();
-            //converts into list of response DTO where non-deleted offers is filtered
-            var offerModel = new List<OfferResponseDTO>(
-                offers.Where(o => !o.IsDeleted)
-                .Select(o => new OfferResponseDTO
-                {
-                    Id = o.Id,
-                    Name = o.Name,
-                    Message = o.Message,
-                    StartDate = o.StartDate,
-                    EndDate = o.EndDate,
-                    Type = o.Type,
-                    DiscountPercent = o.DiscountPercent,
-                    CreatedBy = o.CreatedBy,
-                }).ToList()
-            );
+            var offerModel = new List<OfferResponseDTO>();
 
+            foreach (Offer offer in offers)
+            {
+                var thisOfferModel = new OfferResponseDTO();
+                var user = await _userManager.FindByIdAsync(offer.CreatedBy.ToString());
+
+                thisOfferModel.Id = offer.Id;
+                thisOfferModel.Name = offer.Name;
+                thisOfferModel.Message = offer.Message;
+                thisOfferModel.StartDate = offer.StartDate;
+                thisOfferModel.EndDate = offer.EndDate;
+                thisOfferModel.Type = offer.Type;
+                thisOfferModel.DiscountPercent = offer.DiscountPercent;
+                thisOfferModel.CreatedBy = $"{user.FirstName} {user.LastName}";
+
+                offerModel.Add(thisOfferModel);
+            }
             //returns list
             return offerModel;
         }
