@@ -31,7 +31,7 @@ public class RequestService : IRequest
 
         request.ApprovedById = ApprovedById;
         request.IsApproved = true;
-        
+
         await _dbContext.SaveChangesAsync(default(CancellationToken));
 
         return new ResponseDTO
@@ -115,7 +115,18 @@ public class RequestService : IRequest
     public async Task<ResponseDTO> CreateRequest(RequestRequestDTO model, string UserId)
     {
         var user = await _userManager.FindByIdAsync(UserId);
+        var userAttachment = await _dbContext.Attachments.FindAsync(UserId);
         var car = await _dbContext.Cars.FindAsync(model.RequestedCarId);
+
+        if (userAttachment == null)
+        {
+            return new ResponseDTO
+            {
+                Status = "Error",
+                Message = "Please update your profile first."
+            };
+        }
+        
 
         if (user == null)
         {
