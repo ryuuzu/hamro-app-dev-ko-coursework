@@ -1,0 +1,179 @@
+﻿@page "/registration"
+
+<PageTitle>Registration</PageTitle>
+
+@inherits LayoutComponentBase
+
+@using System.ComponentModel.DataAnnotations
+<PageTitle>Register</PageTitle>
+
+ <div class="container-fluid position-relative nav-bar p-0">
+        <div class="position-relative" style="z-index: 9;">
+            <nav class="navbar navbar-expand-lg navbar-dark py-3 py-lg-0 pl-3 pl-lg-5">
+                <a href="" class="navbar-brand">
+                    <h1 class="text-uppercase text-dark mb-1">Hamro Car Rental</h1>
+                </a>
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-between px-3" id="navbarCollapse">
+                <div class="navbar-nav ml-auto py-0 ">
+                        <a href="/" class="nav-item nav-link active">Home</a>
+                        <a href="login" class="nav-item nav-link">Login</a>
+                        <a href="registration" class="nav-item nav-link">Register</a>
+                        <a href="customerrequest" class="nav-item nav-link">Requests</a>
+                    <a href="customerdamage" class="nav-item nav-link">Damages</a>
+                     </div>
+                      
+                    </div>
+            </nav>
+                </div>
+            
+        </div>
+
+<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+
+
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.Large" >
+            <MudGrid Class="d-flex justify-center">
+           
+                
+                <MudItem xs="12" sm="8">
+                    <MudCard>
+                        <MudCardContent>
+                            <h3>Registration</h3>
+                            <MudGrid>
+                                <MudItem xs="12" sm="6">
+                                    <MudTextField Label="First name" HelperText="Enter first name" Variant="Variant.Outlined" 
+                                                  @bind-Value="model.Firstname" For="@(() => model.Firstname)" />
+                                </MudItem>
+                                <MudItem xs="12" sm="6">
+                                    <MudTextField Label="Last name" HelperText="Enter last name" Variant="Variant.Outlined" 
+                                                  @bind-Value="model.Lastname" For="@(() => model.Lastname)" />
+                                </MudItem>
+                            </MudGrid>
+
+                            <MudGrid>
+                                <MudItem xs="12" sm="6">
+                                    <MudTextField Label="Email" Class="mt-3" HelperText="example@gmail.com" Variant="Variant.Outlined"
+                                                  @bind-Value="model.Email" For="@(() => model.Email)" />
+                                </MudItem>
+                                <MudItem xs="12" sm="6">
+                                    <MudTextField Label="Phone" Class="mt-3" HelperText="Enter phone number" Variant="Variant.Outlined"
+                                                  @bind-Value="model.Phone" For="@(() => model.Phone)" Immediate="true" />
+                                </MudItem>
+                            </MudGrid>
+                           
+                            
+
+                            <MudTextField Label="Address" Class="mt-3" HelperText="Enter address" Variant="Variant.Outlined"
+                                          @bind-Value="model.Address" For="@(() => model.Address)" />
+
+                            <MudGrid>
+                                <MudItem xs="12" sm="6">
+                                    <MudTextField Label="Enter Password" HelperText="Choose a strong password" Variant="Variant.Outlined" Class="mt-3"
+                                                  @bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password" />
+                                </MudItem>
+                                <MudItem xs="12" sm="6">
+                                    <MudTextField Label="Confirm Password" HelperText="Repeat the password" Variant="Variant.Outlined" Class="mt-3"
+                                                  @bind-Value="model.Password2" For="@(() => model.Password2)" InputType="InputType.Password" />
+                                </MudItem>
+                            </MudGrid>
+                            <MudSelect Dense="true" T="string" Label="Verification File" Variant="Variant.Outlined">
+                                <MudSelectItem Value="@("Driver's License")" />
+                                <MudSelectItem Value="@("Citizenship")" />
+                            </MudSelect>
+
+                            <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles">
+                                <ButtonTemplate Context="fileupload">
+                                    <MudButton HtmlTag="label"
+                                               Variant="Variant.Filled"
+                                               Color="Color.Primary"
+                                               StartIcon="@Icons.Material.Filled.CloudUpload"
+                                               for="@fileupload">
+                                        Upload File
+                                    </MudButton>
+                                    @if (files != null)
+                                    {
+                                        <MudText>@files.Count() File@(files.Count() == 1 ? "" : "s"):</MudText>
+                                        <MudList>
+                                            @foreach (var file in files)
+                                            {
+                                                <MudListItem Icon="@Icons.Material.Filled.AttachFile" @key="@file">
+                                                    @file.Name <code>@file.Size bytes</code>
+                                                </MudListItem>
+                                            }
+                                        </MudList>
+                                    }
+
+                                </ButtonTemplate>
+                            </MudFileUpload>
+                        </MudCardContent>
+                        
+                        <MudCardActions>
+                            <MudButton Variant="Variant.Filled" Color="Color.Dark" OnClick="HandleLogin" Class="mt-4 mx-auto btn btn-primary">Submit</MudButton>
+                        </MudCardActions>
+                     
+                    </MudCard>
+                </MudItem>
+            </MudGrid>
+        </MudContainer>
+    </MudMainContent>
+
+</EditForm>
+
+
+@code {
+    RegisterAccountForm model = new RegisterAccountForm();
+    bool success;
+
+    public class RegisterAccountForm
+    {
+        [Required]
+        public string Firstname { get; set; }
+
+        [Required]
+        public string Lastname { get; set; }
+
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; }
+
+        [Required]
+        public int Phone { get; set; } 
+
+        [Required]
+        public string Address { get; set; }
+
+        [Required]
+        [StringLength(30, ErrorMessage = "Password must be at least 8 characters long.", MinimumLength = 8)]
+        public string Password { get; set; }
+
+        [Required]
+        [Compare(nameof(Password))]
+        public string Password2 { get; set; }
+
+    }
+
+
+    IList<IBrowserFile> files = new List<IBrowserFile>();
+    private void UploadFiles(IBrowserFile file)
+    {
+        files.Add(file);
+    }
+
+    private void OnValidSubmit(EditContext context)
+    {
+        success = true;
+        StateHasChanged();
+    }
+
+    private void HandleLogin()
+    {
+    }
+
+
+}
+
