@@ -140,6 +140,20 @@ public class RequestService : IRequest
             };
         }
 
+        var activeCarRequests =
+            requests.Where(cr =>
+                cr.StartDate >= DateTime.Now && cr.EndDate <= DateTime.Now && cr.IsApproved &&
+                cr.RequestedCarId == car.Id);
+
+        if (activeCarRequests.Any())
+        {
+            return new ResponseDTO
+            {
+                Status = "Error",
+                Message = "Car is not available for the selected dates."
+            };
+        }
+
 
         if (user == null)
         {
