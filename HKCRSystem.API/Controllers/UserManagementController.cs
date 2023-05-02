@@ -10,10 +10,12 @@ namespace HKCRSystem.API.Controllers
     public class UserManagementController : ControllerBase
     {
         private readonly IUserManagement _userManagement;
+        private readonly IHelper _helper;
 
-        public UserManagementController(IUserManagement userManagement)
+        public UserManagementController(IUserManagement userManagement, IHelper helper)
         {
             _userManagement = userManagement;
+            _helper = helper;
         }
 
         [HttpPost]
@@ -21,7 +23,9 @@ namespace HKCRSystem.API.Controllers
         [Route("/api/user/add/staff")]
         public async Task<ResponseDTO> AddStaff([FromBody] StaffAddRequestDTO model)
         {
-            var result = await _userManagement.AddStaff(model);
+            //gets the id from the request header
+            string id = _helper.GetIdFromToken(HttpContext);
+            var result = await _userManagement.AddStaff(model, id);
             return result;
         }
 
@@ -30,7 +34,9 @@ namespace HKCRSystem.API.Controllers
         [Route("/api/user/get/staff")]
         public async Task<List<StaffResponseDTO>> GetAllStaffAsync()
         {
-            var result = await _userManagement.GetAllStaffAsync();
+            //gets the id from the request header
+            string id = _helper.GetIdFromToken(HttpContext);
+            var result = await _userManagement.GetAllStaffAsync(id);
             return result;
         }
 
