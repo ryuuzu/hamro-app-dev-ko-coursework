@@ -1,0 +1,83 @@
+﻿@page "/approved"
+@inject HttpClient Http
+
+<PageTitle>Approved</PageTitle>
+
+
+<MudContainer Class="mt-5 px-8" MaxWidth="MaxWidth.False">
+    <h1>Staff</h1>
+    <MudSimpleTable Hover="@hover" Striped="@striped" Style="overflow-x: auto;">
+        <thead>
+            <tr>
+                @foreach (var h in headings)
+                {
+                    <th>@h</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in rows)
+            {
+                <tr>
+                    @foreach (var x in row.Split())
+                    {
+                        <td>@x</td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </MudSimpleTable>
+    <MudToolBar>
+        <MudSwitch @bind-Checked="@hover" Color="Color.Primary">Hover</MudSwitch>
+        <MudSwitch @bind-Checked="@striped" Color="Color.Tertiary">Striped</MudSwitch>
+        @* <mudswitch @bind-checked="@bordered" color="color.warning">bordered</mudswitch>
+        <MudSwitch @bind-Checked="@dense" Color="Color.Secondary">Dense</MudSwitch>*@
+    </MudToolBar>
+
+</MudContainer>
+
+
+
+<div class="d-flex justify-content-end mx-5">
+    <MudButton OnClick="OpenDialog" Variant="Variant.Filled" Color="Color.Primary">
+        Edit rating
+    </MudButton>
+</div>
+
+<MudDialog @bind-IsVisible="visible" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> Add
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+     
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Submit" Class="px-10">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+
+@code {
+    //private bool dense = false;
+    //private bool bordered = false;
+    private bool hover = true;
+    private bool striped = false;
+    private bool visible;
+    private int rating;
+    private void OpenDialog() => visible = true;
+    void Submit() => visible = false;
+
+    private DialogOptions dialogOptions = new() { FullWidth = true };
+    private async Task SubmitForm()
+    {
+        // Submit form logic goes here
+    }
+
+    string[] headings = { "StaffID", "Fname", "Lname", "Email", "Phone No", "Address", "JoinDate", "Salary", };
+    string[] rows = {
+        @"STAFF01 Khemraj Singh khemrajsinght57@gmail.com 9819555520 NPJ 20/02/2001/ 15000",
+    };
+}

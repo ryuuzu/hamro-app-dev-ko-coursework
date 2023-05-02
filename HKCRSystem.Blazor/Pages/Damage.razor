@@ -1,5 +1,62 @@
 ﻿@page "/damage"
 
+@using HKCRSystem.Blazor.Data.DTO
+@inject ISnackbar Snackbar
 <PageTitle>damage</PageTitle>
 
-<h1>Damage</h1>
+<h1>customer</h1>
+
+<MudContainer Class="mt-8 position-relative">
+    <MudTable FixedHeader="true" FixedFooter="true" Height="450px" Items="@customersDatas" Hover="true" Striped="false">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">customer</MudText>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<CustomerData, object>(CustData => CustData.FirstName)">FirstName</MudTableSortLabel></MudTh>
+            <MudTh>LastName</MudTh>
+            <MudTh>Email</MudTh>
+            <MudTh>Address</MudTh>
+            <MudTh>PhoneNumber</MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="FirstName">@context.FirstName</MudTd>
+            <MudTd DataLabel="LastName">@context.LastName</MudTd>
+            <MudTd DataLabel="Email">@context.Email</MudTd>
+            <MudTd DataLabel="Address">@context.Address</MudTd>
+            <MudTd DataLabel="PhoneNumber">@context.PhoneNumber</MudTd>
+            <MudTd DataLabel="Actions">
+               @* <MudButton Variant="Variant.Outlined" Color="Color.Info" StartIcon="@Icons.Material.Rounded.Remove" OnClick="@(() => ToggleWithdrawFromStockPopover(context.Guid))">Withdraw</MudButton> &nbsp;
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Rounded.Add" OnClick="@(() => ToggleAddToStockPopover(context.Guid))">Add</MudButton>*@
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+   
+        @*<MudFab Class="position-absolute" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="ToggleAddItemPopover" Style="bottom:10px; right:10px;" />*@
+</MudContainer>
+
+
+@code {
+    // Global State of the Application
+
+    private List<CustomerData>? customersDatas;
+    //private bool FilterHandler(InventoryItem item) => SearchFilter(item, toSearch);
+    protected override async Task OnInitializedAsync()
+    {
+        customersDatas = new List<CustomerData>
+        {
+            new CustomerData
+            {
+                Id = "C1",
+                FirstName = "Khemraj",
+                LastName = "Singh",
+                Email = "Khemrajsinght57@gmail.com",
+                Address = "Nepalgunj",
+                PhoneNumber = "9819555520"
+            }
+        };
+    }
+}

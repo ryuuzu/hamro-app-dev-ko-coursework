@@ -1,5 +1,55 @@
 ﻿@page "/customers"
-
+@using HKCRSystem.Blazor.Data.DTO
+@inject ISnackbar Snackbar
 <PageTitle>customers</PageTitle>
 
-<h1>Customers</h1>
+
+
+<MudContainer Class="mt-8 position-relative">
+    <MudTable FixedHeader="true" FixedFooter="true" Height="450px" Items="@customersDatas" Hover="true" Striped="false">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Customer</MudText>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<CustomerData, object>(CustData => CustData.FirstName)">First Name</MudTableSortLabel></MudTh>
+            <MudTh>Last Name</MudTh>
+            <MudTh>Email</MudTh>
+            <MudTh>Address</MudTh>
+            <MudTh>PhoneNo</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="First Name">@context.FirstName</MudTd>
+            <MudTd DataLabel="Last Name">@context.LastName</MudTd>
+            <MudTd DataLabel="Email">@context.Email</MudTd>
+            <MudTd DataLabel="Address">@context.Address</MudTd>
+            <MudTd DataLabel="PhoneNo">@context.PhoneNumber</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+
+</MudContainer>
+
+
+@code {
+    // Global State of the Application
+
+    private List<CustomerData>? customersDatas;
+    //private bool FilterHandler(InventoryItem item) => SearchFilter(item, toSearch);
+    protected override async Task OnInitializedAsync()
+    {
+        customersDatas = new List<CustomerData>
+        {
+            new CustomerData
+            {
+                Id = "C1",
+                FirstName = "Khemraj",
+                LastName = "Singh",
+                Email = "Khemrajsinght57@gmail.com",
+                Address = "Nepalgunj",
+                PhoneNumber = "9819555520"
+            }
+        };
+    }
+}
