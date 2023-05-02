@@ -10,8 +10,8 @@ namespace HKCRSystem.Application.Common.Interface
 {
     public interface IUserManagement
     {
-        Task<ResponseDTO> AddStaff(StaffAddRequestDTO model);
-        Task<List<StaffResponseDTO>> GetAllStaffAsync();
+        Task<ResponseDTO> AddStaff(StaffAddRequestDTO model, string id);
+        Task<List<StaffResponseDTO>> GetAllStaffAsync(string id);
         Task<ResponseDTO> UpdateStaff(StaffResponseDTO model);
         Task<ResponseDTO> DeleteStaff(string id);
         Task<ResponseDTO> UpdateProfile(ProfileRequestDTO model, IFormFile file);

@@ -23,8 +23,8 @@ public class RequestService : IRequest
     public async Task<ResponseDTO> AcceptRequest(Guid id, string ApprovedById)
     {
         var request = (await _dbContext.Requests
-            .Include(r => r.RequestedById)
-            .Include(r => r.RequestedCarId)
+            .Include(r => r.RequestedBy)
+            .Include(r => r.RequestedCar)
             .ToListAsync()).FirstOrDefault(r => r.Id == id);
         if (request == null)
         {
@@ -129,6 +129,14 @@ public class RequestService : IRequest
         var user = await _userManager.FindByIdAsync(UserId);
         var userAttachment = await _dbContext.Attachments.FindAsync(UserId);
         var requests = await _dbContext.Requests.ToListAsync();
+        // var returns = await _dbContext.Returns
+        //     .Include(r => r.Request.RequestedBy)
+        //     .Include(r => r.Request.Billing)
+        //     .ToListAsync();
+        var damages = await _dbContext.Damages
+            .Include(d => d.Request)
+            .Include(d => d.Billing)
+            .ToListAsync();
         var car = await _dbContext.Cars.FindAsync(model.RequestedCarId);
 
         if (userAttachment == null)
@@ -151,6 +159,17 @@ public class RequestService : IRequest
             {
                 Status = "Error",
                 Message = "Car is not available for the selected dates."
+            };
+        }
+
+        var userUnpaidDamages = damages.Where(d => d.Request.RequestedById == UserId && !d.Billing.IsPaid).ToList();
+
+        if (userUnpaidDamages.Any())
+        {
+            return new ResponseDTO
+            {
+                Status = "Error",
+                Message = "Please clear your bills before proceeding with another rent."
             };
         }
 

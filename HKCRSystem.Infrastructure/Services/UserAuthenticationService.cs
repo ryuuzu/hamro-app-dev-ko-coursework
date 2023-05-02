@@ -235,5 +235,33 @@ namespace HKCRSystem.Infrastructure.Services
         {
             return urlSafeBase64String.Replace('-', '+').Replace('~', '/').Replace('_', '=');
         }
+
+        public async Task<ResponseDTO> ResetPasswordByAdmin(ResetPasswordAdmin model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+
+            if (user == null)
+                return new ResponseDTO()
+                {
+                    Message = "User not found!",
+                    Status = "Error",
+                };
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            var result = await _userManager.ResetPasswordAsync(user, token, model.Password);
+
+            if (result.Succeeded)
+                return new ResponseDTO()
+                {
+                    Message = "Password resetted successfully!",
+                    Status = "Success",
+                };
+            return new ResponseDTO()
+            {
+                Message = "Password reset failed!",
+                Status = "Error",
+            };
+        }
     }
 }

@@ -34,4 +34,22 @@ public class BillingService : IBilling
 
         return billingModel;
     }
+
+    public async Task<ResponseDTO> UpdateBilling(Guid id, string userId)
+    {
+        //gets the instance of bill
+        var billing = await _dbContext.Billings.FindAsync(id);
+        //validates the presence of bill
+        if (billing == null)
+            return new ResponseDTO { Status = "Error", Message = "Billing does not exist!" };
+
+        //updates bill
+        billing.IsPaid = true;
+        billing.UpdatedBy = Guid.Parse(userId);
+        billing.UpdatedTime = DateTime.Now.ToUniversalTime();
+
+        await _dbContext.SaveChangesAsync(default(CancellationToken));
+        
+        return new ResponseDTO { Status = "Success", Message = "Billing marked as paid." };
+    }
 }
