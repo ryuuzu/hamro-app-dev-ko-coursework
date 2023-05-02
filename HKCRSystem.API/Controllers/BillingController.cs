@@ -19,6 +19,15 @@ public class BillingController : ControllerBase
 
     [HttpGet]
     [Authorize(Roles = "Admin, Staff")]
+    [Route("api/get/sales")]
+    public async Task<List<SalesResponseDTO>> GetAllSales()
+    {
+        var result = await _billing.GetAllSales();
+        return result;
+    }
+
+    [HttpGet]
+    [Authorize(Roles = "Admin, Staff")]
     [Route("/api/user/get/billing")]
     public async Task<List<BillingResponseDTO>> GetAllBilling()
     {
