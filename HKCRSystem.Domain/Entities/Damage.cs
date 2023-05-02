@@ -18,6 +18,6 @@ namespace HKCRSystem.Domain.Entities
         public virtual Request Request { get; set; }
 
         [ForeignKey("Billing")] public Guid BillingId { get; set; }
-        public virtual Billing Billing{ get; set; }
+        public virtual Billing Billing { get; set; }
     }
 }
