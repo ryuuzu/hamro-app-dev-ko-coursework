@@ -78,7 +78,11 @@ public class RequestService : IRequest
 
     public async Task<List<RequestResponseDTO>> GetAllRequest()
     {
-        var requests = await _dbContext.Requests.ToListAsync();
+        var requests = await _dbContext.Requests
+            .Include(r => r.RequestedCar)
+            .Include(r => r.RequestedBy)
+            .Include(r => r.ApprovedBy)
+            .ToListAsync();
         var result = new List<RequestResponseDTO>(
             requests.Select(
                 r => new RequestResponseDTO()
@@ -90,8 +94,11 @@ public class RequestService : IRequest
                     Discount = r.Discount,
                     IsCancelled = r.IsCancelled,
                     RequestedCarId = r.RequestedCarId,
+                    RequestedCar = $"{r.RequestedCar.Company} {r.RequestedCar.Model}",
                     RequestedById = r.RequestedById,
+                    RequestedBy = $"{r.RequestedBy.FirstName} {r.RequestedBy.LastName}",
                     ApprovedById = r.ApprovedById,
+                    ApprovedBy = $"{r.ApprovedBy.FirstName} {r.ApprovedBy.LastName}",
                     BillingId = r.BillingId,
                 }
             )
