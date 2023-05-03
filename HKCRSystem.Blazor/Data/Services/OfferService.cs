@@ -1,5 +1,6 @@
 ﻿using HKCRSystem.Blazor.Data.DTO;
 using System.Globalization;
+using Newtonsoft.Json;
 
 namespace HKCRSystem.Blazor.Data.Services
 {
@@ -12,7 +13,8 @@ namespace HKCRSystem.Blazor.Data.Services
             _httpClient = httpClient;
         }
 
-        public async Task<ResponseDTO> AddOffer(string name, string message, string startDate, string endDate, string type, string discount, string token)
+        public async Task<ResponseDTO> AddOffer(string name, string message, string startDate, string endDate,
+            string type, string discount, string token)
         {
             var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:7096/api/add/offer");
             request.Headers.Add("Authorization", $"Bearer {token}");
@@ -27,10 +29,21 @@ namespace HKCRSystem.Blazor.Data.Services
             var response = await _httpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();
             var result = await response.Content.ReadAsStringAsync();
-            
+
+            return new ResponseDTO { Status = "Success", Message = result };
         }
 
-        public async Task<ResponseDTO> UpdateOffer(string id, string name, string message, string startDate, string endDate, string type, string discount, string token)
+        public async Task<List<OfferData>?> GetOfferAsync()
+        {
+            var response = await _httpClient.GetAsync("https://localhost:7284/api/get/offer");
+
+            var result = response.Content.ReadAsStringAsync().Result;
+            var rr = JsonConvert.DeserializeObject<List<OfferData>>(result);
+            return rr;
+        }
+
+        public async Task<ResponseDTO> UpdateOffer(string id, string name, string message, string startDate,
+            string endDate, string type, string discount, string token)
         {
             var request = new HttpRequestMessage(HttpMethod.Put, "https://localhost:7096/api/update/offer");
             request.Headers.Add("Authorization", $"Bearer {token}");
