@@ -17,6 +17,7 @@ builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<UserManagementService>();
 builder.Services.AddScoped<BillingService>();
 builder.Services.AddScoped<OfferService>();
+builder.Services.AddScoped<ReturnService>();
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddBlazoredLocalStorage();
