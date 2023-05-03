@@ -1,4 +1,5 @@
 ﻿using HKCRSystem.Blazor.Data.DTO;
+using System.Globalization;
 
 namespace HKCRSystem.Blazor.Data.Services
 {
@@ -11,10 +12,10 @@ namespace HKCRSystem.Blazor.Data.Services
             _httpClient = httpClient;
         }
 
-        public async Task<ResponseDTO> AddOffer(string name, string message, string startDate, string endDate, string type, string discount)
+        public async Task<ResponseDTO> AddOffer(string name, string message, string startDate, string endDate, string type, string discount, string token)
         {
             var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:7096/api/add/offer");
-            request.Headers.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJkY2ZmYzQ3MS0yOGIyLTRlODgtYWQwOC1kNDg2Yzk3OTkwZWQiLCJlbWFpbCI6ImhrY3JfYWRtaW5AZ21haWwuY29tIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNjgzMDQxODc3LCJleHAiOjE2ODMwODUwNzcsImlhdCI6MTY4MzA0MTg3NywiaXNzIjoiaGtjcnMiLCJhdWQiOiJoa2Nycy1hcHAifQ.BgBHjhxg5IeaikHNbxKElvOr_K-bXdD_tvjPR8eyIuY");
+            request.Headers.Add("Authorization", $"Bearer {token}");
             var content = new MultipartFormDataContent();
             content.Add(new StringContent(name), "name");
             content.Add(new StringContent(message), "message");
@@ -30,10 +31,10 @@ namespace HKCRSystem.Blazor.Data.Services
             return new ResponseDTO { Status = "Success", Message = result };
         }
 
-        public async Task<ResponseDTO> UpdateOffer(string id, string name, string message, string startDate, string endDate, string type, string discount)
+        public async Task<ResponseDTO> UpdateOffer(string id, string name, string message, string startDate, string endDate, string type, string discount, string token)
         {
             var request = new HttpRequestMessage(HttpMethod.Put, "https://localhost:7096/api/update/offer");
-            request.Headers.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJkY2ZmYzQ3MS0yOGIyLTRlODgtYWQwOC1kNDg2Yzk3OTkwZWQiLCJlbWFpbCI6ImhrY3JfYWRtaW5AZ21haWwuY29tIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNjgzMDQxODc3LCJleHAiOjE2ODMwODUwNzcsImlhdCI6MTY4MzA0MTg3NywiaXNzIjoiaGtjcnMiLCJhdWQiOiJoa2Nycy1hcHAifQ.BgBHjhxg5IeaikHNbxKElvOr_K-bXdD_tvjPR8eyIuY");
+            request.Headers.Add("Authorization", $"Bearer {token}");
             var content = new MultipartFormDataContent();
             content.Add(new StringContent(id), "id");
             content.Add(new StringContent(name), "name");
@@ -50,10 +51,10 @@ namespace HKCRSystem.Blazor.Data.Services
             return new ResponseDTO { Status = "Success", Message = result };
         }
 
-        public async Task<ResponseDTO> DeleteOffer(string id)
+        public async Task<ResponseDTO> DeleteOffer(string id, string token)
         {
             var request = new HttpRequestMessage(HttpMethod.Delete, $"https://localhost:7096/api/delete/offer/{id}");
-            request.Headers.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJkY2ZmYzQ3MS0yOGIyLTRlODgtYWQwOC1kNDg2Yzk3OTkwZWQiLCJlbWFpbCI6ImhrY3JfYWRtaW5AZ21haWwuY29tIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNjgzMDQxODc3LCJleHAiOjE2ODMwODUwNzcsImlhdCI6MTY4MzA0MTg3NywiaXNzIjoiaGtjcnMiLCJhdWQiOiJoa2Nycy1hcHAifQ.BgBHjhxg5IeaikHNbxKElvOr_K-bXdD_tvjPR8eyIuY");
+            request.Headers.Add("Authorization", $"Bearer {token}");
             var response = await _httpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();
             var result = await response.Content.ReadAsStringAsync();
