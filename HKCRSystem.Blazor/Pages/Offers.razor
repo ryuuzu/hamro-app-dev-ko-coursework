@@ -1,0 +1,199 @@
+﻿@page "/offers"
+@inject HttpClient Http
+@using HKCRSystem.Blazor.Data.DTO
+@inject ISnackbar Snackbar
+
+<PageTitle>offers</PageTitle>
+
+<MudContainer Class="mt-4 position-relative">
+    <div class="d-flex justify-content-end mb-2">
+        <MudButton OnClick="OpenDialogAdd" Variant="Variant.Filled" Color="Color.Primary">
+            Add Offer
+        </MudButton>
+    </div>
+    <MudTable FixedHeader="true" FixedFooter="true" Height="450px" Items="@offersDatas" Hover="true" Striped="false">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Offer</MudText>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<OfferData, object>(OfferData => OfferData.Name)">Name</MudTableSortLabel></MudTh>
+            <MudTh>Message</MudTh>
+            @*<MudTh>Type</MudTh>*@
+            <MudTh>Discount(%)</MudTh>
+            <MudTh>Start Date</MudTh>
+            <MudTh>End Date</MudTh>
+            <MudTh>Created By</MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Name">@context.Name</MudTd>
+            <MudTd DataLabel="Message">@context.Message</MudTd>
+            @*<MudTd DataLabel="Type">@context.Type</MudTd>*@
+            <MudTd DataLabel="Discount(%)">@context.DiscountPercent</MudTd>
+            <MudTd DataLabel="Start Date">@context.StartDate</MudTd>
+            <MudTd DataLabel="End Date">@context.EndDate</MudTd>
+            <MudTd DataLabel="Created By">@context.CreatedBy</MudTd>
+
+            <MudTd DataLabel="Actions">
+                <MudIconButton Icon="@Icons.Material.Filled.EditNote" Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick=@(()=>OpenDialogEdit(context)) aria-label="Edit"></MudIconButton>
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" aria-label="delete" />
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+</MudContainer>
+
+<MudDialog @bind-IsVisible="visibleAdd" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Person" Class="mr-3" /> Add Offer
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudGrid>
+            <MudItem xs="6">
+                <MudTextField @bind-Value="TextValue" Label="Name" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField @bind-Value="TextValue" Label="Message" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            
+           @* <MudItem xs="6">
+                <MudTextField @bind-Value="TextValue" Label="Type" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>*@
+            <MudItem xs="6">
+                <MudTextField @bind-Value="TextValue" Label="Discount" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField @bind-Value="TextValue" Label="CreatedBy" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField @bind-Value="TextValue" Label="Start Date" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField @bind-Value="TextValue" Label="End Date" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+          
+           
+        @*    <MudItem xs="6">
+                <MudSelect T="string" Label="Role" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                    <MudSelectItem T="string" Value="@("Admin")" />
+                    <MudSelectItem T="string" Value="@("Staff")" />
+                </MudSelect>
+            </MudItem>*@
+
+        </MudGrid>
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Color="Color.Info" Size="Size.Small" OnClick="SubmitAdd">Save</MudButton>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" Size="Size.Small" OnClick="CloseAdd">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+<MudDialog @bind-IsVisible="visibleEdit" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Person" Class="mr-3" /> Edit Offer
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudGrid>
+            <MudItem xs="6">
+                <MudTextField @bind-Value=@_offerData.Name Label="Name" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField @bind-Value=@_offerData.Message Label="Message" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+           @* <MudItem xs="6">
+                <MudTextField @bind-Value=@_offerData.Type Label="Type" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>*@
+            <MudItem xs="6">
+                <MudTextField @bind-Value=@_offerData.DiscountPercent Label="Discount" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField @bind-Value=@_offerData.CreatedBy Label="CreatedBy" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField @bind-Value=@_offerData.StartDate Label="StartDate" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField @bind-Value=@_offerData.EndDate Label="EndData" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+         
+           @*<MudItem xs="6">
+                <MudSelect T="string" @bind-Value=@_offerData.Role Label="Role" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                    <MudSelectItem T="string" Value="@("Admin")" />
+                    <MudSelectItem T="string" Value="@("Staff")" />
+                </MudSelect>
+            </MudItem>*@
+        </MudGrid>
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Color="Color.Info" Size="Size.Small" OnClick="SubmitEdit">Save</MudButton>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" Size="Size.Small" OnClick="CloseEdit">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code{
+    private List<OfferData>? offersDatas;
+    protected override async Task OnInitializedAsync()
+    {
+        offersDatas = new List<OfferData>
+        {
+            new OfferData
+            {
+                Id = Guid.NewGuid(),
+                Name = "Khemraj",
+                Message = "Singh",
+                Type = "Khemraj",
+                StartDate = DateTime.Now,
+                EndDate = DateTime.Now,
+                DiscountPercent = 10.0f,
+                CreatedBy = "Staff"
+            },
+             new OfferData
+            {
+                Id = Guid.NewGuid(),
+                Name = "Khemraj",
+                Message = "Singh",
+                Type = "Khemraj",
+                StartDate = DateTime.Now,
+                EndDate = DateTime.Now,
+                DiscountPercent = 10.0f,
+                CreatedBy = "Staff1"
+            }
+        };
+    }
+    private bool visibleAdd;
+    private bool visibleEdit;
+
+    private OfferData _offerData { get; set; }
+
+    private void OpenDialogAdd() => visibleAdd = true;
+
+    private void OpenDialogEdit(OfferData offerdata)
+    {
+        _offerData = offerdata;
+        visibleEdit = true;
+    }
+
+    void CloseAdd() => visibleAdd = false;
+    void CloseEdit() => visibleEdit = false;
+
+    void SubmitAdd() => visibleAdd = false;
+    void SubmitEdit() => visibleEdit = false;
+
+    public string TextValue { get; set; }
+
+
+    private DialogOptions dialogOptions = new() { FullWidth = true };
+    private async Task SubmitForm()
+    {
+        // Submit form logic goes here
+    }
+}

@@ -1,0 +1,117 @@
+﻿@page "/request"
+@inject HttpClient Http
+@using HKCRSystem.Blazor.Data.DTO
+@inject ISnackbar Snackbar
+
+<PageTitle>Request</PageTitle>
+
+
+<MudContainer Class="mt-4 position-relative">
+    <MudTable FixedHeader="true" FixedFooter="true" Height="450px" Items="@requestsDatas" Hover="true" Striped="false">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Request</MudText>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<RequestData, object>(RequestData => RequestData.RequestedCar)">Requested Car</MudTableSortLabel></MudTh>
+            <MudTh>Price</MudTh>
+            <MudTh>Discount</MudTh>
+            <MudTh>Start Date</MudTh>
+            <MudTh>End Date</MudTh>
+            <MudTh>Requested By</MudTh>
+            <MudTh>Approved By</MudTh>
+            <MudTh>Is Cancelled</MudTh>
+            <MudTh>Billing Id</MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="RequestedCar">@context.RequestedCar</MudTd>
+            <MudTd DataLabel="Price">@context.Price</MudTd>
+            <MudTd DataLabel="Discount">@context.Discount</MudTd>
+            <MudTd DataLabel="StartDate">@context.StartDate.ToString("MM/dd/yyyy")</MudTd>
+            <MudTd DataLabel="EndDate">@context.EndDate.ToString("MM/dd/yyyy")</MudTd>
+            <MudTd DataLabel="RequestedBy">@context.RequestedBy</MudTd>
+            <MudTd DataLabel="ApprovedBy">@context.ApprovedBy</MudTd>
+            <MudTd DataLabel="IsCancelled">@context.IsCancelled</MudTd>
+            <MudTd DataLabel="BillingId">@context.BillingId</MudTd>
+            <MudTd DataLabel="Actions">
+                <MudIconButton Icon="@Icons.Material.Filled.Check" Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick=@(()=>OpenDialogEdit(context)) aria-label="Edit"></MudIconButton>
+                <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" aria-label="delete" />
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+</MudContainer>
+
+
+<MudDialog @bind-IsVisible="visibleEdit" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Person" Class="mr-3" /> Edit Staff
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+       
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Color="Color.Info" Size="Size.Small" OnClick="SubmitEdit">Save</MudButton>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" Size="Size.Small" OnClick="CloseEdit">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+
+@code {
+    private List<RequestData>? requestsDatas;
+    //private bool FilterHandler(InventoryItem item) => SearchFilter(item, toSearch);
+    protected override async Task OnInitializedAsync()
+    {
+        requestsDatas = new List<RequestData>
+        {
+             new RequestData
+            {
+                Id = Guid.NewGuid(),
+                RequestedCar = "Suzuki",
+                Price = 1000,
+                Discount = 10.0f,
+                StartDate = DateTime.Now,
+                EndDate = DateTime.Now,
+                RequestedBy = "khemraj",
+                ApprovedBy = "Staff001",
+                IsCancelled = false,
+                BillingId = Guid.NewGuid()
+            }
+        };
+    }
+
+    private bool visibleAdd;
+    private bool visibleEdit;
+
+    private RequestData _requestData { get; set; }
+
+    
+
+    private void OpenDialogEdit(RequestData requestData)
+    {
+        _requestData = requestData;
+        visibleEdit = true;
+    }
+
+   
+    void CloseEdit() => visibleEdit = false;
+
+    void SubmitAdd() => visibleAdd = false;
+    void SubmitEdit() => visibleEdit = false;
+
+    public string TextValue { get; set; }
+
+
+    private DialogOptions dialogOptions = new() { FullWidth = true };
+    private async Task SubmitForm()
+    {
+        // Submit form logic goes here
+    }
+}
+
+  

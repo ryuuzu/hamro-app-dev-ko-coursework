@@ -1,0 +1,116 @@
+﻿@page "/damage"
+
+@using HKCRSystem.Blazor.Data.DTO
+@inject ISnackbar Snackbar
+<PageTitle>damage</PageTitle>
+
+
+<MudContainer Class="mt-8 position-relative">
+    <MudTable FixedHeader="true" FixedFooter="true" Height="450px" Items="@damagesDatas" Hover="true" Striped="false">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Damage</MudText>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<DamageData, object>(DamageData => DamageData.Description)">Description</MudTableSortLabel></MudTh>
+            <MudTh>Damage Date</MudTh>
+            <MudTh>Requested By</MudTh>
+            <MudTh>Reported Date</MudTh>
+            <MudTh>Damaged Car</MudTh>
+            <MudTh>Reviewed By</MudTh>
+            <MudTh>Price</MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Description">@context.Description</MudTd>
+            <MudTd DataLabel="DamageDate">@context.DamageDate</MudTd>
+            <MudTd DataLabel="RequestedBy">@context.RequestedBy</MudTd>
+            <MudTd DataLabel="ReportedDate">@context.ReportedDate</MudTd>
+            <MudTd DataLabel="DamagedCar">@context.DamagedCar</MudTd>
+            <MudTd DataLabel="ReviewedBy">@context.ReviewedBy</MudTd>
+            <MudTd DataLabel="Price">@context.Price</MudTd>
+            <MudTd DataLabel="Actions">
+                <MudIconButton Icon="@Icons.Material.Filled.EditNote" Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick=@(()=>OpenDialogEdit(context)) aria-label="Edit"></MudIconButton>
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+</MudContainer>
+
+<MudDialog @bind-IsVisible="visibleEdit" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Person" Class="mr-3" /> Update Damage
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudGrid>
+            <MudItem xs="12">
+                <MudTextField @bind-Value=@_damageData.Description Label="Description" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField @bind-Value=@_damageData.DamagedCar Label="DamagedCar" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField @bind-Value=@_damageData.Price Label="Price" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField @bind-Value=@_damageData.DamageDate Label="DamageDate" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField @bind-Value=@_damageData.ReportedDate Label="ReportedDate" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField @bind-Value=@_damageData.RequestedBy Label="RequestedBy" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField @bind-Value=@_damageData.ReviewedBy Label="ReviewedBy" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            
+        </MudGrid>
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Color="Color.Info" Size="Size.Small" OnClick="SubmitEdit">Save</MudButton>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" Size="Size.Small" OnClick="CloseEdit">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+    // Global State of the Application
+
+    private List<DamageData>? damagesDatas;
+    protected override async Task OnInitializedAsync()
+    {
+        damagesDatas = new List<DamageData>
+        {
+            new DamageData
+            {
+               Id = Guid.NewGuid(),
+               Description  = "Tesla",
+               DamageDate  = DateTime.Now,
+               RequestedBy = "Khemraj",
+               ReportedDate = DateTime.Now,
+               DamagedCar = "Tesla",
+               ReviewedBy = "Staff",
+               Price = 200.0f
+            }
+        };
+    }
+    private bool visibleEdit;
+    private DamageData _damageData { get; set; }
+    private void OpenDialogEdit(DamageData damagedata)
+    {
+        _damageData = damagedata;
+        visibleEdit = true;
+    }
+    void SubmitEdit() => visibleEdit = false;
+    void CloseEdit() => visibleEdit = false;
+    private DialogOptions dialogOptions = new() { FullWidth = true };
+    private async Task SubmitForm()
+    {
+        // Submit form logic goes here
+    }
+}

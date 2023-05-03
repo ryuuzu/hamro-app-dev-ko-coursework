@@ -1,0 +1,117 @@
+﻿@page "/return"
+@inject HttpClient Http
+@using HKCRSystem.Blazor.Data.DTO
+@inject ISnackbar Snackbar
+
+<PageTitle>return</PageTitle>
+
+<MudContainer Class="mt-4 position-relative">
+    <div class="d-flex justify-content-end mb-2">
+        <MudButton OnClick="OpenDialogAdd" Variant="Variant.Filled" Color="Color.Primary">
+            Return
+        </MudButton>
+    </div>
+    <MudTable FixedHeader="true" FixedFooter="true" Height="450px" Items="@returnsDatas" Hover="true" Striped="false">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Return</MudText>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<ReturnData, object>(ReturnData => ReturnData.RequestId)">RequestID</MudTableSortLabel></MudTh>
+            <MudTh>AcceptedBy</MudTh>
+            <MudTh>ReturnDate</MudTh>
+            <MudTh>CarName</MudTh>
+            <MudTh>UserName</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="RequestId">@context.RequestId</MudTd>
+            <MudTd DataLabel="CarName">@context.CarName</MudTd>
+            <MudTd DataLabel="UserName">@context.UserName</MudTd>
+            <MudTd DataLabel="ReturnDate">@context.ReturnDate</MudTd>
+            <MudTd DataLabel="AcceptedBy">@context.AcceptedBy</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+</MudContainer>
+
+<MudDialog @bind-IsVisible="visibleAdd" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Person" Class="mr-3" /> Return
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudGrid>
+            <MudItem xs="6">
+                <MudTextField @bind-Value="TextValue" Label="RequestId" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField @bind-Value="TextValue" Label="CarName" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField @bind-Value="TextValue" Label="UserName" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField @bind-Value="TextValue" Label="ReturnDate" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField @bind-Value="TextValue" Label="AcceptedBy" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+        </MudGrid>
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Color="Color.Info" Size="Size.Small" OnClick="SubmitAdd">Save</MudButton>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" Size="Size.Small" OnClick="CloseAdd">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+    private List<ReturnData>? returnsDatas;
+    //private bool FilterHandler(InventoryItem item) => SearchFilter(item, toSearch);
+    protected override async Task OnInitializedAsync()
+    {
+        returnsDatas = new List<ReturnData>
+        {
+            new ReturnData
+            {
+                Id = Guid.NewGuid(),
+                RequestId = Guid.NewGuid(),
+                AcceptedBy = "Staff",
+                ReturnDate = DateTime.Now,
+                CarName = "KN",
+                UserName = "Khemraj"
+            }
+        };
+    }
+
+    private bool visibleAdd;
+    private bool visibleEdit;
+
+    private ReturnData _returnData { get; set; }
+
+    private void OpenDialogAdd() => visibleAdd = true;
+
+    private void OpenDialogEdit(ReturnData returndata)
+    {
+        _returnData = returndata;
+        visibleEdit = true;
+    }
+
+    void CloseAdd() => visibleAdd = false;
+    void CloseEdit() => visibleEdit = false;
+
+    void SubmitAdd() => visibleAdd = false;
+    void SubmitEdit() => visibleEdit = false;
+
+    public string TextValue { get; set; }
+
+
+    private DialogOptions dialogOptions = new() { FullWidth = true };
+    private async Task SubmitForm()
+    {
+        // Submit form logic goes here
+    }
+}

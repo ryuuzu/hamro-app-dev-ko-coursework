@@ -1,0 +1,196 @@
+﻿@page "/staff"
+@inject HttpClient Http
+@using HKCRSystem.Blazor.Data.DTO
+@inject ISnackbar Snackbar
+
+<PageTitle>staff</PageTitle>
+
+<MudContainer Class="mt-4 position-relative">
+    <div class="d-flex justify-content-end mb-2">
+        <MudButton OnClick="OpenDialogAdd" Variant="Variant.Filled" Color="Color.Primary">
+            Add Staff
+        </MudButton>
+    </div>
+    <MudTable FixedHeader="true" FixedFooter="true" Height="450px" Items="@staffsDatas" Hover="true" Striped="false">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Staff</MudText>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<StaffData, object>(StaffData => StaffData.FirstName)">First Name</MudTableSortLabel></MudTh>
+            <MudTh>Last Name</MudTh>
+            <MudTh>Email</MudTh>
+            <MudTh>Address</MudTh>
+            <MudTh>PhoneNo</MudTh>
+            <MudTh>Role</MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="First Name">@context.FirstName</MudTd>
+            <MudTd DataLabel="Last Name">@context.LastName</MudTd>
+            <MudTd DataLabel="Email">@context.Email</MudTd>
+            <MudTd DataLabel="Address">@context.Address</MudTd>
+            <MudTd DataLabel="PhoneNo">@context.PhoneNumber</MudTd>
+            <MudTd DataLabel="Role">@context.Role</MudTd>
+            <MudTd DataLabel="Actions">
+                <MudIconButton Icon="@Icons.Material.Filled.EditNote" Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick=@(()=>OpenDialogEdit(context)) aria-label="Edit"></MudIconButton>
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" aria-label="delete" />
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+</MudContainer>
+
+<MudDialog @bind-IsVisible="visibleAdd" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Person" Class="mr-3" /> Add Staff
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudGrid>
+            <MudItem xs="6">
+                <MudTextField @bind-Value="TextValue" Label="First Name" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField @bind-Value="TextValue" Label="Last Name" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="12">
+                <MudTextField @bind-Value="TextValue" Label="Email" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="12">
+                <MudTextField @bind-Value="TextValue" Label="Address" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField @bind-Value="TextValue" Label="Phone Number" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6" >            
+                <MudSelect T="string" Label="Role" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                    <MudSelectItem T="string" Value="@("Admin")" />
+                    <MudSelectItem T="string" Value="@("Staff")" />
+                </MudSelect>
+            </MudItem>
+
+        </MudGrid>
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Color="Color.Info" Size="Size.Small" OnClick="SubmitAdd">Save</MudButton>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" Size="Size.Small" OnClick="CloseAdd">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+<MudDialog @bind-IsVisible="visibleEdit" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Person" Class="mr-3" /> Edit Staff
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudGrid>
+            <MudItem xs="6">
+                <MudTextField @bind-Value=@_staffData.FirstName Label="First Name" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField @bind-Value=@_staffData.LastName Label="Last Name" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="12">
+                <MudTextField @bind-Value=@_staffData.Email Label="Email" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="12">
+                <MudTextField @bind-Value=@_staffData.Address Label="Address" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField @bind-Value=@_staffData.PhoneNumber Label="Phone Number" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudSelect T="string" @bind-Value=@_staffData.Role Label="Role" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                    <MudSelectItem T="string" Value="@("Admin")" />
+                    <MudSelectItem T="string" Value="@("Staff")" />
+                </MudSelect>
+            </MudItem>
+        </MudGrid>
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Color="Color.Info" Size="Size.Small" OnClick="SubmitEdit">Save</MudButton>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" Size="Size.Small" OnClick="CloseEdit">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private List<StaffData>? staffsDatas;
+    //private bool FilterHandler(InventoryItem item) => SearchFilter(item, toSearch);
+    protected override async Task OnInitializedAsync()
+    {
+        staffsDatas = new List<StaffData>
+        {
+            new StaffData
+            {
+                Id = "Staff001",
+                FirstName = "Khemraj",
+                LastName = "Singh",
+                Email = "Khemrajsinght57@gmail.com",
+                Address = "Nepalgunj",
+                PhoneNumber = "9819555520",
+                Role = "Staff"
+            },
+            new StaffData{
+                Id = "Staff002",
+                FirstName = "Khem",
+                LastName = "Khan",
+                Email = "Khemrajsingh@gmail.com",
+                Address = "KTM",
+                PhoneNumber = "9819555520",
+                Role = "Admin"
+            },
+            new StaffData{
+                Id = "Staff002",
+                FirstName = "Khem",
+                LastName = "Khan",
+                Email = "Khemrajsingh@gmail.com",
+                Address = "KTM",
+                PhoneNumber = "9819555520",
+                Role = "Admin"
+            },
+            new StaffData{
+                Id = "Staff002",
+                FirstName = "Khem",
+                LastName = "Khan",
+                Email = "Khemrajsingh@gmail.com",
+                Address = "KTM",
+                PhoneNumber = "9819555520",
+                Role = "Admin"
+            }
+        };
+    }
+
+    private bool visibleAdd;
+    private bool visibleEdit;
+
+    private StaffData _staffData { get; set; }
+
+    private void OpenDialogAdd() => visibleAdd = true;
+
+    private void OpenDialogEdit(StaffData staffdata)
+    {
+        _staffData = staffdata;
+        visibleEdit = true;
+    }
+
+    void CloseAdd() => visibleAdd = false;
+    void CloseEdit() => visibleEdit = false;
+
+    void SubmitAdd() => visibleAdd = false;
+    void SubmitEdit() => visibleEdit = false;
+
+    public string TextValue { get; set; }
+
+
+    private DialogOptions dialogOptions = new() { FullWidth = true };
+    private async Task SubmitForm()
+    {
+        // Submit form logic goes here
+    }
+}
