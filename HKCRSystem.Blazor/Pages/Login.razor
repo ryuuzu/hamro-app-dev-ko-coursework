@@ -3,7 +3,7 @@
 <PageTitle>Login</PageTitle>
 
 @inherits LayoutComponentBase
-
+@inject NavigationManager NavManager
 @using System.ComponentModel.DataAnnotations
 <PageTitle>Login</PageTitle>
 
@@ -42,7 +42,7 @@
                                                                           @bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password" />
                                                         </MudCardContent>
                                                         <MudCardActions>
-                                                            <MudButton Variant="Variant.Filled" Color="Color.Dark" Class="mt-4 mx-auto btn btn-primary">Submit</MudButton>
+                                                            <MudButton Variant="Variant.Filled" Color="Color.Dark" Class="mt-4 mx-auto btn btn-primary" ButtonType="ButtonType.Submit">Submit</MudButton>
                                                         </MudCardActions>
                                                     </MudCard>
 
@@ -78,20 +78,20 @@
         [EmailAddress]
         public string Email { get; set; }
 
-     
+
 
         [Required]
         [StringLength(30, ErrorMessage = "Password must be at least 8 characters long.", MinimumLength = 8)]
         public string Password { get; set; }
 
-    
+
 
     }
 
-    private void OnValidSubmit(EditContext context)
+    private void OnValidSubmit()
     {
-        success = true;
-        StateHasChanged();
+        //NavManager.NavigateTo("/");
+        Console.WriteLine(model.Email);
     }
 
 
