@@ -28,7 +28,6 @@ namespace HKCRSystem.Blazor.Data.Services
             response.EnsureSuccessStatusCode();
             var result = await response.Content.ReadAsStringAsync();
             
-            return new ResponseDTO { Status = "Success", Message = result };
         }
 
         public async Task<ResponseDTO> UpdateOffer(string id, string name, string message, string startDate, string endDate, string type, string discount, string token)

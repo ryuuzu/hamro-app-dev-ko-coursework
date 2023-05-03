@@ -7,7 +7,6 @@ namespace HKCRSystem.Blazor.Data.Services
     {
 
         private readonly HttpClient _httpClient;
-
         public BillingService(HttpClient httpClient)
         {
             _httpClient = httpClient;
@@ -21,7 +20,7 @@ namespace HKCRSystem.Blazor.Data.Services
             response.EnsureSuccessStatusCode();
             var result = await response.Content.ReadAsStringAsync();
 
-            return new ResponseDTO { Status = "Success", Message = result };
         }
+
     }
 }

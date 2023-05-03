@@ -1,5 +1,8 @@
 ﻿@page "/customers"
-@using HKCRSystem.Blazor.Data.DTO
+@using HKCRSystem.Blazor.Data
+@using HKCRSystem.Blazor.Data.DTO;
+@using HKCRSystem.Blazor.Data.Services
+@inject CustomerService CustomerService
 @inject ISnackbar Snackbar
 <PageTitle>customers</PageTitle>
 
@@ -39,17 +42,6 @@
     //private bool FilterHandler(InventoryItem item) => SearchFilter(item, toSearch);
     protected override async Task OnInitializedAsync()
     {
-        customersDatas = new List<CustomerData>
-        {
-            new CustomerData
-            {
-                Id = "C1",
-                FirstName = "Khemraj",
-                LastName = "Singh",
-                Email = "Khemrajsinght57@gmail.com",
-                Address = "Nepalgunj",
-                PhoneNumber = "9819555520"
-            }
-        };
+        customersDatas = await CustomerService.GetCustomerAsync();
     }
 }

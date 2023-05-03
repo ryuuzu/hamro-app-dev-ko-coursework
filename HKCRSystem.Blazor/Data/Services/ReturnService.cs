@@ -1,4 +1,5 @@
 ﻿using HKCRSystem.Blazor.Data.DTO;
+using Newtonsoft.Json;
 
 namespace HKCRSystem.Blazor.Data.Services
 {
@@ -6,6 +7,8 @@ namespace HKCRSystem.Blazor.Data.Services
     {
         private readonly HttpClient _httpClient;
 
+            private readonly HttpClient _httpClient;
+            private string baseUrl = "https://localhost:7284/";
         public ReturnService(HttpClient httpClient)
         {
             _httpClient = httpClient;
@@ -22,7 +25,7 @@ namespace HKCRSystem.Blazor.Data.Services
             response.EnsureSuccessStatusCode();
             var result = await response.Content.ReadAsStringAsync();
 
-            return new ResponseDTO { Status = "Success", Message = result };
         }
+
     }
 }

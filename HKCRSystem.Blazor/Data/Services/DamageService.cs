@@ -1,4 +1,5 @@
 ﻿using HKCRSystem.Blazor.Data.DTO;
+using Newtonsoft.Json;
 
 namespace HKCRSystem.Blazor.Data.Services
 {
@@ -7,6 +8,7 @@ namespace HKCRSystem.Blazor.Data.Services
 
         private readonly HttpClient _httpClient;
 
+        private string baseUrl = "https://localhost:7284/";
         public DamageService(HttpClient httpClient)
         {
             _httpClient = httpClient;
@@ -24,6 +26,7 @@ namespace HKCRSystem.Blazor.Data.Services
             var response = await _httpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();
             var result = await response.Content.ReadAsStringAsync();
+            var response = await _httpClient.GetAsync("https://localhost:7284/api/get/damage");
 
             return new ResponseDTO { Status = "Success", Message = result };
         }
@@ -40,6 +43,9 @@ namespace HKCRSystem.Blazor.Data.Services
             var result = await response.Content.ReadAsStringAsync();
 
             return new ResponseDTO { Status = "Success", Message = result };
+            var result = response.Content.ReadAsStringAsync().Result;
+            var rr = JsonConvert.DeserializeObject<List<DamageData>>(result);
+            return rr;
         }
     }
 }

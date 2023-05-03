@@ -1,5 +1,9 @@
 ﻿@page "/Car"
+@using HKCRSystem.Blazor.Data
 @using HKCRSystem.Blazor.Data.DTO;
+@using HKCRSystem.Blazor.Data.Services
+@inject CarService CarService
+
 <PageTitle>Car</PageTitle>
 
 <MudContainer Class="mt-4 position-relative">
@@ -103,32 +107,15 @@
 </MudDialog>
 
 @code {
+
+
+
     private List<CarData>? carsDatas;
     //private bool FilterHandler(InventoryItem item) => SearchFilter(item, toSearch);
     protected override async Task OnInitializedAsync()
     {
-        carsDatas = new List<CarData>
-        {
-             new CarData{
-                Id = Guid.NewGuid(),
-                Company = "Khem",
-                Model = "Khan",
-                Price = 2000.0f,
-                Status = "New",
-                IsAvailable = false,
-                CreatedBy = Guid.NewGuid()
-            },
-            new CarData{
-                Id = Guid.NewGuid(),
-                Company = "Raj",
-                Model = "Khan",
-                Price = 10000.0f,
-                Status = "Old",
-                IsAvailable = false,
-                CreatedBy = Guid.NewGuid()
-            }
-           
-        };
+        carsDatas = await CarService.GetCarAsync();
+      
     }
 
     private bool visibleAdd;

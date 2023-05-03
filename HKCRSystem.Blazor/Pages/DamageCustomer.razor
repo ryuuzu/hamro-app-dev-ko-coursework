@@ -1,6 +1,9 @@
 ﻿@page "/customerdamage"
 @inject HttpClient Http
-@using HKCRSystem.Blazor.Data.DTO
+@using HKCRSystem.Blazor.Data
+@using HKCRSystem.Blazor.Data.DTO;
+@using HKCRSystem.Blazor.Data.Services
+@inject DamageCustomerService DamageCustomerService
 @inject ISnackbar Snackbar
 
 <PageTitle>Request</PageTitle>
@@ -44,22 +47,13 @@
 
     private List<DamageDTO>? damagesDatas;
     //private bool FilterHandler(InventoryItem item) => SearchFilter(item, toSearch);
+ 
     protected override async Task OnInitializedAsync()
     {
-        damagesDatas = new List<DamageDTO>
-        {
-            new DamageDTO
-            {
-                Id = Guid.NewGuid(),
-                Description= "kk",
-                DamageDate = DateTime.Now,
-                RequestedBy = "ram",
-                ReportedDate = DateTime.Now,
-                DamagedCar = "bmw",
-                ReviewedBy = "shyam",
-                Price = 10.0f,
-            }
-        };
+       
+          damagesDatas = await DamageCustomerService.GetDamageCustomerAsync();
+     
+    }
     }
 
 }
