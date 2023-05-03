@@ -15,11 +15,8 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddMudServices();
 builder.Services.AddScoped<LoginService>();
-<<<<<<< HEAD
 builder.Services.AddScoped<CarRequestService>();
-=======
 builder.Services.AddScoped<RegisterService>();
->>>>>>> 4b98e0241a344aba994d8950a4ad2436b1257390
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddBlazoredLocalStorage();
