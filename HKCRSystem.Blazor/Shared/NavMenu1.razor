@@ -1,32 +1,17 @@
-﻿<div class="container-fluid position-relative nav-bar p-0">
-    <div class="position-relative" style="z-index: 9; border-bottom:1px solid gray">
-        <nav class="navbar navbar-expand-lg navbar-dark py-3 py-lg-0 pl-3 pl-lg-5">
-            <a href="" class="navbar-brand">
-                <h1 class="text-uppercase text-dark mb-1">Hamro Car Rental</h1>
-            </a>
-            <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse justify-content-between px-3" id="navbarCollapse">
-                <div class="navbar-nav ml-auto py-0">
-                    <a href="/" class="nav-item nav-link active">Home</a>
-                    <a href="login" class="nav-item nav-link">Login</a>
-                    <a href="registration" class="nav-item nav-link">Register</a>
-                    <a href="customerrequest" class="nav-item nav-link">Requests</a>
-                    <a href="customerdamage" class="nav-item nav-link">Damages</a>
-                    <div class="nav-item dropdown" style="padding: 11px">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            User
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <button class="ps-1">Logout</button>
-                            <a class="dropdown-item ps-1 text-black" href="updateprofile">Update Profile</a>
-                        </div>
-                    </div>
-                </div>
 
-            </div>
-        </nav>
-    </div>
+<MudNavMenu>
+    <MudNavLink Icon="@Icons.Material.Filled.Dashboard" Href="/" Match="NavLinkMatch.All">Dashboard</MudNavLink>
+    <MudNavLink Icon="@Icons.Material.Rounded.PersonPin" Href="customers" Match="NavLinkMatch.Prefix">Customers</MudNavLink>
+    <MudNavLink Icon="@Icons.Material.Filled.PersonAdd" Href="staff" Match="NavLinkMatch.Prefix">Staff</MudNavLink>
+    <MudNavLink Icon="@Icons.Material.Filled.CarRental" Href="car" Match="NavLinkMatch.Prefix">Car</MudNavLink>
+    <MudNavLink Icon="@Icons.Material.Filled.LocalOffer" Href="offers" Match="NavLinkMatch.Prefix">Offers</MudNavLink>
+    <MudNavLink Icon="@Icons.Material.Filled.CarCrash" Href="damage" Match="NavLinkMatch.Prefix">Damage</MudNavLink>
+    <MudNavLink Icon="@Icons.Material.Filled.Receipt" Href="billing" Match="NavLinkMatch.Prefix">Billing</MudNavLink>
+    <MudNavLink Icon="@Icons.Material.Filled.Receipt" Href="request" Match="NavLinkMatch.Prefix">Request</MudNavLink>
+    <MudNavLink Icon="@Icons.Material.Filled.TurnRight" Href="return" Match="NavLinkMatch.Prefix">Return</MudNavLink>
+    <MudNavGroup Icon="@Icons.Material.Filled.Settings" Title="Setting" Expanded="true">
+        <MudNavLink Icon="@Icons.Material.Filled.Lock" Href="changePassword" Match="NavLinkMatch.Prefix">Change Password</MudNavLink>
+<MudNavLink Icon="@Icons.Material.Filled.Logout" Href="role" Match="NavLinkMatch.Prefix">Logout</MudNavLink>
 
-</div>
+    </MudNavGroup>
+</MudNavMenu>
