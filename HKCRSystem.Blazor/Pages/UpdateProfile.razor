@@ -7,7 +7,7 @@
 <PageTitle>Update Profile</PageTitle>
 
 <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
-    <DataAnnotationsValidator />
+    <DataAnnotationsValidator/>
 
 
     <MudMainContent>
@@ -21,43 +21,42 @@
                             <MudGrid>
                                 <MudItem xs="12" sm="6">
                                     <MudTextField Label="First name" HelperText="Enter first name" Variant="Variant.Outlined"
-                                                  @bind-Value="model.Firstname" For="@(() => model.Firstname)" />
+                                                  @bind-Value="model.Firstname" For="@(() => model.Firstname)"/>
                                 </MudItem>
                                 <MudItem xs="12" sm="6">
                                     <MudTextField Label="Last name" HelperText="Enter last name" Variant="Variant.Outlined"
-                                                  @bind-Value="model.Lastname" For="@(() => model.Lastname)" />
+                                                  @bind-Value="model.Lastname" For="@(() => model.Lastname)"/>
                                 </MudItem>
                             </MudGrid>
 
                             <MudGrid>
                                 <MudItem xs="12" sm="6">
                                     <MudTextField Label="Email" Class="mt-3" HelperText="example@gmail.com" Variant="Variant.Outlined"
-                                                  @bind-Value="model.Email" For="@(() => model.Email)" />
+                                                  @bind-Value="model.Email" For="@(() => model.Email)"/>
                                 </MudItem>
                                 <MudItem xs="12" sm="6">
                                     <MudTextField Label="Phone" Class="mt-3" HelperText="Enter phone number" Variant="Variant.Outlined"
-                                                  @bind-Value="model.Phone" For="@(() => model.Phone)" Immediate="true" />
+                                                  @bind-Value="model.Phone" For="@(() => model.Phone)" Immediate="true"/>
                                 </MudItem>
                             </MudGrid>
 
 
-
                             <MudTextField Label="Address" Class="mt-3" HelperText="Enter address" Variant="Variant.Outlined"
-                                          @bind-Value="model.Address" For="@(() => model.Address)" />
+                                          @bind-Value="model.Address" For="@(() => model.Address)"/>
 
                             <MudGrid>
                                 <MudItem xs="12" sm="6">
                                     <MudTextField Label="Enter Password" HelperText="Choose a strong password" Variant="Variant.Outlined" Class="mt-3"
-                                                  @bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password" />
+                                                  @bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password"/>
                                 </MudItem>
                                 <MudItem xs="12" sm="6">
                                     <MudTextField Label="Confirm Password" HelperText="Repeat the password" Variant="Variant.Outlined" Class="mt-3"
-                                                  @bind-Value="model.Password2" For="@(() => model.Password2)" InputType="InputType.Password" />
+                                                  @bind-Value="model.Password2" For="@(() => model.Password2)" InputType="InputType.Password"/>
                                 </MudItem>
                             </MudGrid>
                             <MudSelect Dense="true" T="string" Label="Verification File" Variant="Variant.Outlined">
-                                <MudSelectItem Value="@("Driver's License")" />
-                                <MudSelectItem Value="@("Citizenship")" />
+                                <MudSelectItem Value="@("Driver's License")"/>
+                                <MudSelectItem Value="@("Citizenship")"/>
                             </MudSelect>
 
                             <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles">
@@ -128,11 +127,11 @@
         [Required]
         [Compare(nameof(Password))]
         public string Password2 { get; set; }
-
     }
 
 
     IList<IBrowserFile> files = new List<IBrowserFile>();
+
     private void UploadFiles(IBrowserFile file)
     {
         files.Add(file);
@@ -150,4 +149,3 @@
 
 
 }
-
