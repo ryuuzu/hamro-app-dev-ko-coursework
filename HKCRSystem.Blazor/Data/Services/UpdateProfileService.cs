@@ -12,11 +12,11 @@ public class UpdateProfileService
         _httpClient = httpClient;
     }
 
-    public async Task<ResponseDTO?> RegisterUser(string firstName, string lastName, string email,
+    public async Task<ResponseDTO?> UpdateUserProfile(string accessToken, string firstName, string lastName, string email,
         string phoneNumber, string address, string password, Stream? document)
     {
         var request = new HttpRequestMessage(HttpMethod.Put, "https://localhost:7096/api/user/update/profile");
-        request.Headers.Add("Authorization", "Bearer {{access_token}}");
+        request.Headers.Add("Authorization", $"Bearer {accessToken}");
         var content = new MultipartFormDataContent();
         content.Add(new StringContent(firstName), "FirstName");
         content.Add(new StringContent(lastName), "LastName");
