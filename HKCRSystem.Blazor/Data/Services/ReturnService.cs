@@ -5,22 +5,19 @@ namespace HKCRSystem.Blazor.Data.Services
 {
     public class ReturnService
     {
-        
+        private readonly HttpClient _httpClient;
+
             private readonly HttpClient _httpClient;
             private string baseUrl = "https://localhost:7284/";
-            public ReturnService(HttpClient httpClient)
-            {
-                _httpClient = httpClient;
-            }
+        public ReturnService(HttpClient httpClient)
+        {
+            _httpClient = httpClient;
+        }
 
-            public async Task<List<ReturnData>?> GetReturnAsync()
-            {
-                var response = await _httpClient.GetAsync("https://localhost:7284/api/get/return");
+        public async Task<ResponseDTO> CreateRetun(string requestId)
+        {
 
-                var result = response.Content.ReadAsStringAsync().Result;
-                var rr = JsonConvert.DeserializeObject<List<ReturnData>>(result);
-                return rr;
-            }
+        }
 
     }
 }
