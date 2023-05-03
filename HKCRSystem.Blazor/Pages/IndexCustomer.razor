@@ -10,7 +10,8 @@
 @using HKCRSystem.Blazor.Data.DTO;
 @using HKCRSystem.Blazor.Data.Services;
 
-
+@using HKCRSystem.Blazor.Data.Services
+@inject CarRequestService RequestService
 
 <body>
     <!-- Carousel Start -->
@@ -350,9 +351,9 @@
     //            RequestCarID = Guid.NewGuid(),
     //            StartDate = DateTime.Now,
     //            EndDate = DateTime.Now,
-                
+
     //        }
-         
+
     //    };
     //}
 
