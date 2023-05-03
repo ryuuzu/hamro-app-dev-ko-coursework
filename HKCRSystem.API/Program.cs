@@ -3,6 +3,7 @@ using HKCRSystem.Infrastructure.DI;
 using HKCRSystem.Infrastructure.Services;
 using System.Text.Json;
 
+const string myAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -15,6 +16,15 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: myAllowSpecificOrigins,
+        policy =>
+        {
+            policy.WithOrigins("https://localhost:7284", "http://localhost:5045");
+        });
+});
 
 var app = builder.Build();
 
@@ -32,6 +42,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors(myAllowSpecificOrigins);
 app.UseHttpsRedirection();
 
 app.UseRouting();
