@@ -3,7 +3,8 @@
 <MudThemeProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
-    <MudLayout>
+
+<MudLayout>
     <MudAppBar Elevation="1">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudSpacer />
@@ -35,6 +36,7 @@
 
 @code {
     bool _drawerOpen = true;
+    public string Search { get; set; }
 
     void DrawerToggle()
     {
