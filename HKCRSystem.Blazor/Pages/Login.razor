@@ -7,6 +7,8 @@
 @using System.ComponentModel.DataAnnotations
 @using HKCRSystem.Blazor.Data.Services
 @inject LoginService LoginService
+@inject Blazored.LocalStorage.ILocalStorageService localStore
+
 <PageTitle>Login</PageTitle>
 
 <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
@@ -93,6 +95,7 @@
     private async void OnValidSubmit()
     {
         var result = await LoginService.UserLogin(model.Email, model.Password);
+        await localStore.SetItemAsync("access", result.Message);
     }
 
 
