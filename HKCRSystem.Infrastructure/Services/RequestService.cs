@@ -48,7 +48,7 @@ public class RequestService : IRequest
 
         return new ResponseDTO
         {
-            Status = "Error",
+            Status = "Success",
             Message = "Request has been accepted!"
         };
     }
@@ -71,8 +71,8 @@ public class RequestService : IRequest
 
         return new ResponseDTO
         {
-            Status = "Error",
-            Message = "Request has been accepted!"
+            Status = "Success",
+            Message = "Request has been denied!"
         };
     }
 
@@ -269,8 +269,8 @@ public class RequestService : IRequest
 
         return new ResponseDTO
         {
-            Status = "Error",
-            Message = "Request has been accepted!"
+            Status = "Success",
+            Message = "Request has been cancelled!"
         };
     }
 }
