@@ -1,6 +1,9 @@
 ﻿@page "/offers"
 @inject HttpClient Http
-@using HKCRSystem.Blazor.Data.DTO
+@using HKCRSystem.Blazor.Data
+@using HKCRSystem.Blazor.Data.DTO;
+@using HKCRSystem.Blazor.Data.Services
+@inject OfferService OfferService
 @inject ISnackbar Snackbar
 
 <PageTitle>offers</PageTitle>
@@ -143,31 +146,7 @@
     private List<OfferData>? offersDatas;
     protected override async Task OnInitializedAsync()
     {
-        offersDatas = new List<OfferData>
-        {
-            new OfferData
-            {
-                Id = Guid.NewGuid(),
-                Name = "Khemraj",
-                Message = "Singh",
-                Type = "Khemraj",
-                StartDate = DateTime.Now,
-                EndDate = DateTime.Now,
-                DiscountPercent = 10.0f,
-                CreatedBy = "Staff"
-            },
-             new OfferData
-            {
-                Id = Guid.NewGuid(),
-                Name = "Khemraj",
-                Message = "Singh",
-                Type = "Khemraj",
-                StartDate = DateTime.Now,
-                EndDate = DateTime.Now,
-                DiscountPercent = 10.0f,
-                CreatedBy = "Staff1"
-            }
-        };
+        offersDatas = await OfferService.GetOfferAsync();
     }
     private bool visibleAdd;
     private bool visibleEdit;

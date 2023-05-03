@@ -1,44 +1,10 @@
 @page "/"
 
 <PageTitle>Index</PageTitle>
-
-@*<MudContainer Class="mt-5 px-8" MaxWidth="MaxWidth.False">
-    <h1>Dashboard</h1>
-    <p>Welcome to our Car Rental System.</p>
-    <MudGrid>
-        <MudItem xs="12" sm="6" md="3">
-            <MudPaper Elevation="2" Class="pa-4" Style="height:150px; width:300px;">
-                Hello
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="12" sm="6" md="3">
-            <MudPaper Elevation="2" Class="pa-4" Style="height:150px; width:300px;"></MudPaper>
-        </MudItem>
-        <MudItem xs="12" sm="6" md="3">
-            <MudPaper Elevation="2" Class="pa-4" Style="height:150px; width:300px;"></MudPaper>
-        </MudItem>
-        <MudItem xs="12" sm="6" md="3">
-            <MudPaper Elevation="2" Class="pa-4" Style="height:150px; width:300px;"></MudPaper>
-        </MudItem>
-        <MudItem xs="12" sm="6">
-            <MudPaper Elevation="2" Class="pa-4" Style="height: 100%"></MudPaper>
-           
-        </MudItem>
-        <MudItem xs="12" sm="6">
-            <MudPaper Elevation="2" Class="pa-4" Style="height: 100%"></MudPaper>
-        </MudItem>
-        <MudItem xs="12" sm="6" md="4">
-            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
-        </MudItem>
-        <MudItem xs="12" sm="6" md="4">
-            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
-        </MudItem>
-        <MudItem xs="12" sm="12" md="4">
-            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
-        </MudItem>
-    </MudGrid>
-</MudContainer>
-*@
+@using HKCRSystem.Blazor.Data
+@using HKCRSystem.Blazor.Data.DTO;
+@using HKCRSystem.Blazor.Data.Services
+@inject DashboardService DashboardService
 
 
 <body id="page-top">
@@ -302,6 +268,16 @@
 
 
 @code {
+
+     private List<DashboardDTO>? dashboardDatas;
+    //private bool FilterHandler(InventoryItem item) => SearchFilter(item, toSearch);
+    protected override async Task OnInitializedAsync()
+    {
+        dashboardDatas = await DashboardService.GetDashboardAsync();
+    }
+
+
+
     private int index = -1; //default value cannot be 0 -> first selectedindex is 0.
     int dataSize = 3;
     double[] data = { 77, 25, 20};

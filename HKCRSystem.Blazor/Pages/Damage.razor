@@ -1,6 +1,8 @@
 ﻿@page "/damage"
-
-@using HKCRSystem.Blazor.Data.DTO
+@using HKCRSystem.Blazor.Data
+@using HKCRSystem.Blazor.Data.DTO;
+@using HKCRSystem.Blazor.Data.Services
+@inject DamageService DamageService
 @inject ISnackbar Snackbar
 <PageTitle>damage</PageTitle>
 
@@ -84,20 +86,9 @@
     private List<DamageData>? damagesDatas;
     protected override async Task OnInitializedAsync()
     {
-        damagesDatas = new List<DamageData>
-        {
-            new DamageData
-            {
-               Id = Guid.NewGuid(),
-               Description  = "Tesla",
-               DamageDate  = DateTime.Now,
-               RequestedBy = "Khemraj",
-               ReportedDate = DateTime.Now,
-               DamagedCar = "Tesla",
-               ReviewedBy = "Staff",
-               Price = 200.0f
-            }
-        };
+       
+          damagesDatas = await DamageService.GetDamageAsync();
+     
     }
     private bool visibleEdit;
     private DamageData _damageData { get; set; }

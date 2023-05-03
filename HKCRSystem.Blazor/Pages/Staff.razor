@@ -1,6 +1,9 @@
 ﻿@page "/staff"
 @inject HttpClient Http
-@using HKCRSystem.Blazor.Data.DTO
+@using HKCRSystem.Blazor.Data
+@using HKCRSystem.Blazor.Data.DTO;
+@using HKCRSystem.Blazor.Data.Services
+@inject StaffService StaffService
 @inject ISnackbar Snackbar
 
 <PageTitle>staff</PageTitle>
@@ -124,46 +127,7 @@
     //private bool FilterHandler(InventoryItem item) => SearchFilter(item, toSearch);
     protected override async Task OnInitializedAsync()
     {
-        staffsDatas = new List<StaffData>
-        {
-            new StaffData
-            {
-                Id = "Staff001",
-                FirstName = "Khemraj",
-                LastName = "Singh",
-                Email = "Khemrajsinght57@gmail.com",
-                Address = "Nepalgunj",
-                PhoneNumber = "9819555520",
-                Role = "Staff"
-            },
-            new StaffData{
-                Id = "Staff002",
-                FirstName = "Khem",
-                LastName = "Khan",
-                Email = "Khemrajsingh@gmail.com",
-                Address = "KTM",
-                PhoneNumber = "9819555520",
-                Role = "Admin"
-            },
-            new StaffData{
-                Id = "Staff002",
-                FirstName = "Khem",
-                LastName = "Khan",
-                Email = "Khemrajsingh@gmail.com",
-                Address = "KTM",
-                PhoneNumber = "9819555520",
-                Role = "Admin"
-            },
-            new StaffData{
-                Id = "Staff002",
-                FirstName = "Khem",
-                LastName = "Khan",
-                Email = "Khemrajsingh@gmail.com",
-                Address = "KTM",
-                PhoneNumber = "9819555520",
-                Role = "Admin"
-            }
-        };
+        staffsDatas = await StaffService.GetStaffAsync();
     }
 
     private bool visibleAdd;

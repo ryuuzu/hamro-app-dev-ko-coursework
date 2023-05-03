@@ -1,5 +1,8 @@
 ﻿@page "/billing"
-@using HKCRSystem.Blazor.Data.DTO
+@using HKCRSystem.Blazor.Data
+@using HKCRSystem.Blazor.Data.DTO;
+@using HKCRSystem.Blazor.Data.Services
+@inject BillingService BillingService
 @inject ISnackbar Snackbar
 
 <PageTitle>Billing</PageTitle>
@@ -38,24 +41,6 @@
     //private bool FilterHandler(InventoryItem item) => SearchFilter(item, toSearch);
     protected override async Task OnInitializedAsync()
     {
-        billingsDatas = new List<BillingData>
-        {
-            new BillingData
-            {
-                Id = Guid.NewGuid(),
-                TotalPrice = 1000.0f,
-                PaymentType = "Esewa",
-                IsPaid = true,
-                AdvancePayment = 500.0f
-            },
-            new BillingData
-            {
-                Id = Guid.NewGuid(),
-                TotalPrice = 10000.0f,
-                PaymentType = "Esewa",
-                IsPaid = false,
-                AdvancePayment = 5000.0f
-            }
-        };
+        billingsDatas = await BillingService.GetBillingAsync();
     }
 }

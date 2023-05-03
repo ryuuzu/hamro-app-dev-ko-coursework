@@ -1,6 +1,9 @@
 ﻿@page "/return"
 @inject HttpClient Http
-@using HKCRSystem.Blazor.Data.DTO
+@using HKCRSystem.Blazor.Data
+@using HKCRSystem.Blazor.Data.DTO;
+@using HKCRSystem.Blazor.Data.Services
+@inject ReturnService ReturnService
 @inject ISnackbar Snackbar
 
 <PageTitle>return</PageTitle>
@@ -73,18 +76,7 @@
     //private bool FilterHandler(InventoryItem item) => SearchFilter(item, toSearch);
     protected override async Task OnInitializedAsync()
     {
-        returnsDatas = new List<ReturnData>
-        {
-            new ReturnData
-            {
-                Id = Guid.NewGuid(),
-                RequestId = Guid.NewGuid(),
-                AcceptedBy = "Staff",
-                ReturnDate = DateTime.Now,
-                CarName = "KN",
-                UserName = "Khemraj"
-            }
-        };
+         returnsDatas = await ReturnService.GetReturnAsync();
     }
 
     private bool visibleAdd;

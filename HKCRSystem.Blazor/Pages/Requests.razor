@@ -1,6 +1,9 @@
 ﻿@page "/customerrequest"
 @inject HttpClient Http
-@using HKCRSystem.Blazor.Data.DTO
+@using HKCRSystem.Blazor.Data
+@using HKCRSystem.Blazor.Data.DTO;
+@using HKCRSystem.Blazor.Data.Services
+@inject RequestCustomerService RequestCustomerService
 @inject ISnackbar Snackbar
 
 <PageTitle>Request</PageTitle>
@@ -115,25 +118,9 @@
     //private bool FilterHandler(InventoryItem item) => SearchFilter(item, toSearch);
     protected override async Task OnInitializedAsync()
     {
-        requestsDatas = new List<RequestDTO>
-        {
-             new RequestDTO
-            {
-                Id = Guid.NewGuid(),
-                Price = 1000,
-                StartDate = DateTime.Now,
-                EndDate = DateTime.Now,
-                Discount = 10.0f,
-                IsCancelled = false,
-                RequestedCarId = Guid.NewGuid(),
-                RequestedById = "kk",
-                ApprovedById = "kk",
-                RequestedCar = "Audi",
-                RequestedBy = "ram",
-                ApprovedBy = "shyam",
-                BillingId = Guid.NewGuid()
-            }
-        };
+    
+        requestsDatas = await RequestCustomerService.GetRequestCustomerAsync();
+      
     }
 
  
