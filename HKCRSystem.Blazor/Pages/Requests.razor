@@ -1,0 +1,168 @@
+﻿@page "/customerrequest"
+@inject HttpClient Http
+@using HKCRSystem.Blazor.Data.DTO
+@inject ISnackbar Snackbar
+
+<PageTitle>Request</PageTitle>
+
+<MudContainer Class="mt-4 position-relative">
+    <div class="d-flex justify-content-end mb-2">
+    </div>
+    <MudTable FixedHeader="true" FixedFooter="true" Height="450px" Items="@requestsDatas" Hover="true" Striped="false">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">User Rent Requests</MudText>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<RequestDTO, object>(RequestDTO => RequestDTO.RequestedCar)">Requested Car</MudTableSortLabel></MudTh>
+            <MudTh>Start Date</MudTh>
+            <MudTh>End Date</MudTh>
+            <MudTh>Price</MudTh>
+            <MudTh>Discount</MudTh>
+            <MudTh>Cancelled</MudTh>
+            <MudTh>Approved By </MudTh>
+            <MudTh>Billing Id</MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Requested Car">@context.RequestedCar</MudTd>
+            <MudTd DataLabel="Start Date">@context.StartDate.ToString("MM/dd/yyyy")</MudTd>
+            <MudTd DataLabel="End Date">@context.EndDate.ToString("MM/dd/yyyy")</MudTd>
+            <MudTd DataLabel="Discount">@context.Discount</MudTd>
+            <MudTd DataLabel="Price">@context.Price</MudTd>
+            <MudTd DataLabel="Cancelled">@context.IsCancelled </MudTd>
+            <MudTd DataLabel="Approved By">@context.ApprovedBy</MudTd>
+            <MudTd DataLabel="Billing Id">@context.BillingId</MudTd>
+            <MudTd DataLabel="Actions">
+                <MudIconButton Icon="@Icons.Material.Filled.EditNote" Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick=@(()=>OpenDialogEdit(context)) aria-label="Edit"></MudIconButton>
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" aria-label="delete" />
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+</MudContainer>
+
+<MudDialog @bind-IsVisible="visibleAdd" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Person" Class="mr-3" /> Add request
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudGrid>
+            <MudItem xs="6">
+                <MudTextField @bind-Value="TextValue" Label="Price" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField @bind-Value="TextValue" Label="Discount" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField @bind-Value="TextValue" Label="StartDate" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField @bind-Value="TextValue" Label="EndDate" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField @bind-Value="TextValue" Label="IsCancelled" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField @bind-Value="TextValue" Label="RequestedCar" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField @bind-Value="TextValue" Label="ApprovedBy" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField @bind-Value="TextValue" Label="BillingId" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+        </MudGrid>
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Color="Color.Info" Size="Size.Small" OnClick="SubmitAdd">Save</MudButton>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" Size="Size.Small" OnClick="CloseAdd">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+<MudDialog @bind-IsVisible="visibleEdit" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Person" Class="mr-3" /> Edit request
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudGrid>
+            <MudItem xs="12">
+                <MudTextField @bind-Value=@_carRequest.StartDate Label ="Start Date" Variant="Variant.Outlined" HelperText="DD/MM/YYYY"></MudTextField>
+            </MudItem>
+            <MudItem xs="12">
+                <MudTextField @bind-Value=@_carRequest.EndDate Label="Endate" Variant="Variant.Outlined" HelperText="DD/MM/YYYY"></MudTextField>
+            </MudItem>
+        </MudGrid>
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Color="Color.Info" Size="Size.Small" OnClick="SubmitEdit">Save</MudButton>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" Size="Size.Small" OnClick="CloseEdit">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+
+
+    private List<RequestDTO>? requestsDatas;
+    //private bool FilterHandler(InventoryItem item) => SearchFilter(item, toSearch);
+    protected override async Task OnInitializedAsync()
+    {
+        requestsDatas = new List<RequestDTO>
+        {
+             new RequestDTO
+            {
+                Id = Guid.NewGuid(),
+                Price = 1000,
+                StartDate = DateTime.Now,
+                EndDate = DateTime.Now,
+                Discount = 10.0f,
+                IsCancelled = false,
+                RequestedCarId = Guid.NewGuid(),
+                RequestedById = "kk",
+                ApprovedById = "kk",
+                RequestedCar = "Audi",
+                RequestedBy = "ram",
+                ApprovedBy = "shyam",
+                BillingId = Guid.NewGuid()
+            }
+        };
+    }
+
+ 
+
+    private bool visibleAdd;
+    private bool visibleEdit;
+
+    private RequestDTO _carRequest { get; set; }
+
+
+    private void OpenDialogEdit(RequestDTO carrequest)
+    {
+        _carRequest = carrequest;
+        visibleEdit = true;
+    }
+
+    void CloseAdd() => visibleAdd = false;
+    void CloseEdit() => visibleEdit = false;
+
+    void SubmitAdd() => visibleAdd = false;
+    void SubmitEdit() => visibleEdit = false;
+
+    public string TextValue { get; set; }
+
+
+    private DialogOptions dialogOptions = new() { FullWidth = true };
+    private async Task SubmitForm()
+    {
+        // Submit form logic goes here
+    }
+
+  }

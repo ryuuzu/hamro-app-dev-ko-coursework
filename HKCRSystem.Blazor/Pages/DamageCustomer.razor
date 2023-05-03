@@ -1,0 +1,65 @@
+﻿@page "/customerdamage"
+@inject HttpClient Http
+@using HKCRSystem.Blazor.Data.DTO
+@inject ISnackbar Snackbar
+
+<PageTitle>Request</PageTitle>
+
+<MudContainer Class="mt-4 position-relative">
+    <div class="d-flex justify-content-end mb-2">
+    </div>
+    <MudTable FixedHeader="true" FixedFooter="true" Height="450px" Items="@damagesDatas" Hover="true" Striped="false">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Damages</MudText>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<DamageDTO, object>(DamageDTO => DamageDTO.DamagedCar)">Damaged Car</MudTableSortLabel></MudTh>
+            <MudTh>Description</MudTh>
+            <MudTh>Damage Date</MudTh>
+            <MudTh>Reported Date</MudTh>
+            <MudTh>Reviewed By</MudTh>
+            <MudTh>Price</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="DamagedCar">@context.DamagedCar</MudTd>
+            <MudTd DataLabel="Description">@context.Description</MudTd>
+            <MudTd DataLabel="DamageDate">@context.DamageDate</MudTd>
+            <MudTd DataLabel="ReportedDate">@context.ReportedDate</MudTd>
+            <MudTd DataLabel="ReviewedBy">@context.ReviewedBy</MudTd>
+            <MudTd DataLabel="Price">@context.Price</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+</MudContainer>
+
+
+
+
+
+
+@code {
+    // Global State of the Application
+
+    private List<DamageDTO>? damagesDatas;
+    //private bool FilterHandler(InventoryItem item) => SearchFilter(item, toSearch);
+    protected override async Task OnInitializedAsync()
+    {
+        damagesDatas = new List<DamageDTO>
+        {
+            new DamageDTO
+            {
+                Id = Guid.NewGuid(),
+                Description= "kk",
+                DamageDate = DateTime.Now,
+                RequestedBy = "ram",
+                ReportedDate = DateTime.Now,
+                DamagedCar = "bmw",
+                ReviewedBy = "shyam",
+                Price = 10.0f,
+            }
+        };
+    }
+
+}
