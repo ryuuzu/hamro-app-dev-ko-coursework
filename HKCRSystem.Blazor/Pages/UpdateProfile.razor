@@ -4,6 +4,9 @@
 @inherits LayoutComponentBase
 
 @using System.ComponentModel.DataAnnotations
+@using HKCRSystem.Blazor.Data.Services
+@inject Blazored.LocalStorage.ILocalStorageService localStore
+@inject UpdateProfileService UpdateProfileService
 <PageTitle>Update Profile</PageTitle>
 
 <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
@@ -86,7 +89,7 @@
                         </MudCardContent>
 
                         <MudCardActions>
-                            <MudButton Variant="Variant.Filled" Color="Color.Dark" OnClick="HandleLogin" Class="mt-4 mx-auto btn btn-primary">Submit</MudButton>
+                            <MudButton Variant="Variant.Filled" Color="Color.Dark" ButtonType="ButtonType.Submit" Class="mt-4 mx-auto btn btn-primary">Submit</MudButton>
                         </MudCardActions>
 
                     </MudCard>
@@ -129,16 +132,27 @@
         public string Password2 { get; set; }
     }
 
-
+    IBrowserFile document;
     IList<IBrowserFile> files = new List<IBrowserFile>();
 
     private void UploadFiles(IBrowserFile file)
     {
+        document = file;
         files.Add(file);
     }
 
-    private void OnValidSubmit(EditContext context)
+    private async void OnValidSubmit(EditContext context)
     {
+        string accessToken = await localStore.GetItemAsync<string>("access");
+        var result = UpdateProfileService.UpdateUserProfile(
+            accessToken,
+            model.Firstname,
+            model.Lastname,
+            model.Email,
+            model.Phone.ToString(),
+            model.Address,
+            model.Password,
+            document.OpenReadStream());
         success = true;
         StateHasChanged();
     }
