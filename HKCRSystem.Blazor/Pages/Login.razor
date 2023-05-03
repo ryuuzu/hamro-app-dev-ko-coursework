@@ -5,6 +5,8 @@
 @inherits LayoutComponentBase
 @inject NavigationManager NavManager
 @using System.ComponentModel.DataAnnotations
+@using HKCRSystem.Blazor.Data.Services
+@inject LoginService LoginService
 <PageTitle>Login</PageTitle>
 
 <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
@@ -88,10 +90,9 @@
 
     }
 
-    private void OnValidSubmit()
+    private async void OnValidSubmit()
     {
-        //NavManager.NavigateTo("/");
-        Console.WriteLine(model.Email);
+        var result = await LoginService.UserLogin(model.Email, model.Password);
     }
 
 
