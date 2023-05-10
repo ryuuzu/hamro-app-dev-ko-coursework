@@ -22,6 +22,7 @@ builder.Services.AddScoped<UserManagementService>();
 builder.Services.AddScoped<BillingService>();
 builder.Services.AddScoped<OfferService>();
 builder.Services.AddScoped<ReturnService>();
+builder.Services.AddScoped<Authorize>();
 
 builder.Services.AddScoped<BillingService>();
 builder.Services.AddScoped<CarService>();

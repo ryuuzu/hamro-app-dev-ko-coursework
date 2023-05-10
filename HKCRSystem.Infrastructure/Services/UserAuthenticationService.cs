@@ -137,10 +137,11 @@ namespace HKCRSystem.Infrastructure.Services
             //gets the user role
             var roles = await _userManager.GetRolesAsync(user);
             var role = roles.FirstOrDefault();
+            var token = _tokenService.GenerateToken(user, role);
+            var message = $"{token},{user.FirstName},{role}";
 
             //retruns success message with token
-            return new ResponseDTO { Status = "Success", Message = _tokenService.GenerateToken(user, role) };
-
+            return new ResponseDTO { Status = "Success", Message = message };
         }
 
         public async Task<ResponseDTO> PasswordChange(string id, ChangePasswordDTO model)

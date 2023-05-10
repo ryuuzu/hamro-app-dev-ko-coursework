@@ -141,7 +141,7 @@ public class RequestService : IRequest
     public async Task<ResponseDTO> CreateRequest(RequestRequestDTO model, string UserId)
     {
         var user = await _userManager.FindByIdAsync(UserId);
-        var userAttachment = await _dbContext.Attachments.FindAsync(UserId);
+        var userAttachment = await _dbContext.Attachments.FindAsync(Guid.Parse(UserId));
         var requests = await _dbContext.Requests.ToListAsync();
         // var returns = await _dbContext.Returns
         //     .Include(r => r.Request.RequestedBy)
@@ -237,8 +237,8 @@ public class RequestService : IRequest
         var request = new Request()
         {
             Price = price,
-            StartDate = model.StartDate,
-            EndDate = model.EndDate,
+            StartDate = model.StartDate.ToUniversalTime(),
+            EndDate = model.EndDate.ToUniversalTime(),
             Discount = discount,
             RequestedCarId = model.RequestedCarId,
             RequestedById = UserId,

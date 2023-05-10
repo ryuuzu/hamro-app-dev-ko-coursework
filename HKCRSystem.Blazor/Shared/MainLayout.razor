@@ -1,19 +1,71 @@
 ﻿@inherits LayoutComponentBase
 
+@using HKCRSystem.Blazor.Data.Services
+@inject Authorize Authorize
+
 <MudThemeProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
-   <NavMenu1/>
+
+@if (!userExists || role == "Customer")
+{
+    <NavMenu1 />
     <MudMainContent Class="p-0">
         @Body
     </MudMainContent>
+}
+else
+{
+    <MudLayout>
+        <MudAppBar Elevation="1">
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+
+            <MudText Style="width:100%; text-align:end">@userName</MudText>
+            <MudMenu Icon="@Icons.Material.Filled.Person" Color="Color.Inherit" aria-label="Person">
+                <MudMenuItem Icon="@Icons.Material.Filled.Person" IconColor="Color.Primary" Href="/users">Role</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Filled.Security" IconColor="Color.Primary" Href="/change-password">Security</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Filled.Logout" IconColor="Color.Error">Logout</MudMenuItem>
+            </MudMenu>
+        </MudAppBar>
+        <MudDrawer @bind-Open="_drawerOpen" Elevation="2">
+            <MudDrawerHeader>
+                <MudText Typo="Typo.h6" Class="px-4">HamroCarRental</MudText>
+            </MudDrawerHeader>
+            <NavMenu />
+        </MudDrawer>
+        <MudMainContent>
+            @Body
+        </MudMainContent>
+    </MudLayout>
+}
+
 
 @code {
     bool _drawerOpen = true;
     public string Search { get; set; }
+    public string userName;
+    private bool userExists = false;
+    public string role;
 
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CheckUserExistence();
+    }
+
+    private async Task CheckUserExistence()
+    {
+        int accessToken = await Authorize.CheckToken();
+        if (accessToken == 1)
+        {
+            userExists = true;
+        }
+
+        userName = await Authorize.GetUser();
+        role = await Authorize.GetRole();
     }
 }

@@ -1,3 +1,8 @@
+@using HKCRSystem.Blazor.Data.Services
+@inject Authorize Authorize
+@inject NavigationManager NavManager
+@inject Blazored.LocalStorage.ILocalStorageService localStore
+
 <div class="container-fluid position-relative nav-bar p-0">
     <div class="position-relative" style="z-index: 9; border-bottom:1px solid gray">
         <nav class="navbar navbar-expand-lg navbar-dark py-3 py-lg-0 pl-3 pl-lg-5">
@@ -9,22 +14,55 @@
             </button>
             <div class="collapse navbar-collapse justify-content-between px-3" id="navbarCollapse">
                 <div class="navbar-nav ml-auto py-0">
-                    <a href="/customer" class="nav-item nav-link active">Home</a>
-                    <a href="login" class="nav-item nav-link">Login</a>
-                    <a href="registration" class="nav-item nav-link">Register</a>
-                    <a href="customerrequest" class="nav-item nav-link">Requests</a>
-                    <a href="customerdamage" class="nav-item nav-link">Damages</a>
-                    <div class="nav-item dropdown" style="padding: 11px">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            User
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <button class="ps-1">Logout</button>
-                            <a class="dropdown-item ps-1 text-black" href="updateprofile">Update Profile</a>
+                    <a href="/" class="nav-item nav-link active">Home</a>
+                    @if (!userExists)
+                    {
+                        <a href="login" class="nav-item nav-link">Login</a>
+                        <a href="registration" class="nav-item nav-link">Register</a>
+                    }
+                    else
+                    {
+                        <a href="customerrequest" class="nav-item nav-link">Requests</a>
+                        <a href="customerdamage" class="nav-item nav-link">Damages</a>
+                        <div class="nav-item dropdown" style="padding: 11px">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                User
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <button class="ps-1" onclick=@logoutHandle>Logout</button>
+                                <a class="dropdown-item ps-1 text-black" href="updateprofile">Update Profile</a>
+                            </div>
                         </div>
-                    </div>
+                    }
                 </div>
             </div>
         </nav>
     </div>
 </div>
+
+@code {
+    private bool userExists = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CheckUserExistence();
+    }
+
+    private async Task CheckUserExistence()
+    {
+        int accessToken = await Authorize.CheckToken();
+        if (accessToken == 1)
+        {
+            userExists = true;
+        }
+    }
+
+
+        public async void logoutHandle()
+        {
+            await localStore.RemoveItemAsync("access");
+            await localStore.RemoveItemAsync("user");
+            await localStore.RemoveItemAsync("role");
+            NavManager.NavigateTo("/login", forceLoad: true);
+        }
+}

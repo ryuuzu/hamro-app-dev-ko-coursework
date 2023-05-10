@@ -1,4 +1,4 @@
-﻿@page "/customer"
+﻿@page "/"
 
 <PageTitle>Homepage</PageTitle>
 
@@ -9,9 +9,11 @@
 @using HKCRSystem.Blazor.Data
 @using HKCRSystem.Blazor.Data.DTO;
 @using HKCRSystem.Blazor.Data.Services;
-
-@using HKCRSystem.Blazor.Data.Services
-@inject CarRequestService RequestService
+@inject NavigationManager NavManager
+@inject Authorize Authorize
+@inject ISnackbar Snackbar
+@inject CarService CarService
+@inject CarRequestService CarRequestService
 
 <body>
     <!-- Carousel Start -->
@@ -52,8 +54,6 @@
         </div>
     </div>
     <!-- Carousel End -->
-
-
     <!-- About Start -->
     <div class="container-fluid py-5">
         <div class="container pt-5 pb-3">
@@ -93,8 +93,6 @@
         </div>
     </div>
     <!-- About End -->
-    
-
     <!-- Services Start -->
     <div class="container-fluid py-5">
         <div class="container pt-5 pb-3">
@@ -136,126 +134,123 @@
                         <p class="m-0" style="text-align: justify;">Our car inspection service provides a comprehensive and thorough assessment of the condition of your car. Damages are tracked and followed through.</p>
                     </div>
                 </div>
-               
+
             </div>
         </div>
     </div>
     <!-- Services End -->
-
-
     <!-- Banner Start -->
-    <div class="container-fluid py-5">
-        <div class="container py-5">
-            <div class="bg-banner py-5 px-4 text-center">
-                <div class="py-5">
-                    <h1 class="display-1 text-uppercase text-primary mb-4">50% OFF</h1>
-                    <h1 class="text-uppercase text-light mb-4">Special Offer For Regular Members</h1>
-               
-                    <a class="btn btn-primary mt-2 py-3 px-5" href="">Register Now</a>
+    @if (!userExists)
+    {
+        <div class="container-fluid py-5">
+            <div class="container py-5">
+                <div class="bg-banner py-5 px-4 text-center">
+                    <div class="py-5">
+                        <h1 class="display-1 text-uppercase text-primary mb-4">50% OFF</h1>
+                        <h1 class="text-uppercase text-light mb-4">Special Offer For Regular Members</h1>
+
+                        <a class="btn btn-primary mt-2 py-3 px-5" href="/registration">Register Now</a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    }
     <!-- Banner End -->
-
-
     <!-- Rent A Car Start -->
 
-   
+
     <div class="container-fluid py-5">
         <div class="container pt-5 pb-3">
             <h1 class="display-4 text-uppercase text-center mb-5">Find Your Car</h1>
             <div class="row">
-                 @*@foreach (var carRequest in carRequests)*@
-                <div class="col-lg-4 col-md-6 mb-2">
-                    <div class="rent-item mb-4">
-                        <h4 class="text-uppercase mb-4">Mercedes Benz R3</h4>
-                        <div class="d-flex justify-content-center mb-4">
-                            <div class="px-2">
-                                <i class="fa fa-car text-primary mr-1"></i>
-                                <span>2015</span>
-                            </div>
-                            <div class="px-2 border-left border-right">
-                                <i class="fa fa-cogs text-primary mr-1"></i>
-                                <span>AUTO</span>
-                            </div>
-                            <div class="px-2">
-                                <i class="fa fa-road text-primary mr-1"></i>
-                                <span>25K</span>
-                            </div>
-                            <div class="px-2">
-                                <i class="fa fa-tag text-primary mr-1"></i>
-                                <span>$99/day</span>
+                @if (carDatas.Count > 0)
+                {
+                    foreach (var car in carDatas)
+                    {
+                        <div class="col-lg-4 col-md-6 mb-2">
+                            <div class="rent-item mb-4">
+                                <h4 class="text-uppercase mb-4">@car.Model</h4>
+                                <div class="d-flex justify-content-center mb-4">
+                                    <div class="px-2">
+                                        <i class="fa fa-car text-primary mr-1"></i>
+                                        <span>@car.Company</span>
+                                    </div>
+                                    <div class="px-2">
+                                        <i class="fa fa-tag text-primary mr-1"></i>
+                                        <span>$@car.Price/day</span>
+                                    </div>
+                                </div>
+
+                                <MudContainer Class="mt-4 position-relative">
+                                    <div class="d-flex justify-content-end mb-2">
+                                        <MudButton OnClick="OpenDialogAdd" Variant="Variant.Filled" Color="Color.Primary">
+                                            Rent Car
+                                        </MudButton>
+                                    </div>
+                                </MudContainer>
+                                <MudDialog @bind-IsVisible="visibleAdd" Options="dialogOptions">
+                                    <TitleContent>
+                                        <MudText Typo="Typo.h6">
+                                            <MudIcon Icon="@Icons.Material.Filled.Person" Class="mr-3" /> Request Car: @car.Model
+                                        </MudText>
+                                    </TitleContent>
+                                    <DialogContent>
+                                        <MudGrid>
+                                            <MudItem xs="12">
+                                                <MudDatePicker @bind-Date="StartDate" Label="Start Date" Variant="Variant.Outlined" />
+                                            </MudItem>
+                                            <MudItem xs="12">
+                                                <MudDatePicker @bind-Date="EndDate" Label="End Date" Variant="Variant.Outlined" />
+                                            </MudItem>
+
+                                        </MudGrid>
+                                    </DialogContent>
+                                    <DialogActions>
+                                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Color="Color.Info" Size="Size.Small" OnClick="() => SubmitAdd(car.Id)">Confirm</MudButton>
+                                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" Size="Size.Small" OnClick="CloseAdd">Close</MudButton>
+                                    </DialogActions>
+                                </MudDialog>
                             </div>
                         </div>
-    
-                         <MudContainer Class="mt-4 position-relative">
-                            <div class="d-flex justify-content-end mb-2">
-                                <MudButton OnClick="OpenDialogAdd" Variant="Variant.Filled" Color="Color.Primary">
-                                   Rent Car
-                                </MudButton>
-                            </div>
-                            </MudContainer>
-                        <MudDialog @bind-IsVisible="visibleAdd" Options="dialogOptions">
-                            <TitleContent>
-                                <MudText Typo="Typo.h6">
-                                    <MudIcon Icon="@Icons.Material.Filled.Person" Class="mr-3" /> Add Car
-                                </MudText>
-                            </TitleContent>
-                            <DialogContent>
-                                <MudGrid>
-                                    <MudItem xs="12">
-                                        <MudTextField @bind-Value="TextValue" Label="Start Date" Variant="Variant.Outlined"></MudTextField>
-                                    </MudItem>
-                                    <MudItem xs="12">
-                                        <MudTextField @bind-Value="TextValue" Label="End Date" Variant="Variant.Outlined"></MudTextField>
-                                    </MudItem>
-                                    
-                                </MudGrid>
-                            </DialogContent>
-                            <DialogActions>
-                                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Color="Color.Info" Size="Size.Small" OnClick="SubmitAdd">Confirm</MudButton>
-                                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" Size="Size.Small" OnClick="CloseAdd">Close</MudButton>
-                            </DialogActions>
-                        </MudDialog>
-                    </div>
-                </div>
-               
+                    }
+                }
+                else
+                {
+                    <h3 style="text-align:center">No Car</h3>
+                }
             </div>
         </div>
     </div>
     <!-- Rent A Car End -->
-
-
-
     <!-- Banner Start -->
-    <div class="container-fluid py-5">
-        <div class="container py-5">
-            <div class="row mx-0">
-                <div class="col-lg-6 px-0">
-                    <div class="px-5 bg-secondary d-flex align-items-center justify-content-between" style="height: 350px;">
-                        <img class="img-fluid flex-shrink-0 ml-n5 w-50 mr-4" src="img/banner-left.png" alt="">
-                        <div class="text-right">
-                            <h3 class="text-uppercase text-light mb-3">Want to rent more?</h3>
-                            <a class="btn btn-primary py-2 px-4" href="">Login</a>
+    @if (!userExists)
+    {
+        <div class="container-fluid py-5">
+            <div class="container py-5">
+                <div class="row mx-0">
+                    <div class="col-lg-6 px-0">
+                        <div class="px-5 bg-secondary d-flex align-items-center justify-content-between" style="height: 350px;">
+                            <img class="img-fluid flex-shrink-0 ml-n5 w-50 mr-4" src="img/banner-left.png" alt="">
+                            <div class="text-right">
+                                <h3 class="text-uppercase text-light mb-3">Want to rent more?</h3>
+                                <a class="btn btn-primary py-2 px-4" href="/login">Login</a>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-lg-6 px-0">
-                    <div class="px-5 bg-dark d-flex align-items-center justify-content-between" style="height: 350px;">
-                        <div class="text-left">
-                            <h3 class="text-uppercase text-light mb-3">Looking for a car?</h3>
-                            <a class="btn btn-primary py-2 px-4" href="">Register</a>
+                    <div class="col-lg-6 px-0">
+                        <div class="px-5 bg-dark d-flex align-items-center justify-content-between" style="height: 350px;">
+                            <div class="text-left">
+                                <h3 class="text-uppercase text-light mb-3">Looking for a car?</h3>
+                                <a class="btn btn-primary py-2 px-4" href="/registration">Register</a>
+                            </div>
+                            <img class="img-fluid flex-shrink-0 mr-n5 w-50 ml-4" src="img/banner-right.png" alt="">
                         </div>
-                        <img class="img-fluid flex-shrink-0 mr-n5 w-50 ml-4" src="img/banner-right.png" alt="">
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    }
     <!-- Banner End -->
-
-
     <!-- Contact Start -->
     <div class="container-fluid py-5">
         <div class="container pt-5 pb-3">
@@ -313,14 +308,12 @@
         </div>
     </div>
     <!-- Contact End -->
-
-
     <!-- Footer Start -->
 
     <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
         <div class="col-md-4 d-flex align-items-center">
 
-            <span class="mb-3 mb-md-0 text-muted">© 2023 Hamro Cart Rental</span>
+            <span class="mb-3 mb-md-0 text-muted">© 2023 Hamro Car Rental</span>
         </div>
 
         <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
@@ -332,54 +325,95 @@
             </div>
         </ul>
     </footer>
-  
+
     <!-- Footer End -->
-
-
     <!-- Back to Top -->
     <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="fa fa-angle-double-up"></i></a>
 </body>
 
 @code {
-    private List<RequestDTO>? carsRequests;
-    //private bool FilterHandler(InventoryItem item) => SearchFilter(item, toSearch);
-    //protected override async Task OnInitializedAsync()
-    //{
-    //    carsRequests = new List<CarRequest>
-    //    {
-    //         new CarRequest{
-    //            RequestCarID = Guid.NewGuid(),
-    //            StartDate = DateTime.Now,
-    //            EndDate = DateTime.Now,
-
-    //        }
-
-    //    };
-    //}
-
+    private bool userExists = false;
     private bool visibleAdd;
-    private bool visibleEdit;
+    public DateTime? StartDate { get; set; }
+    public DateTime? EndDate { get; set; }
 
+    private List<CarData>? carDatas = new List<CarData>();
+    private List<RequestDTO>? carsRequests;
     private RequestDTO _carRequest { get; set; }
 
-    private void OpenDialogAdd() => visibleAdd = true;
-
-    private void OpenDialogEdit(RequestDTO carrequest)
+    protected override async Task OnInitializedAsync()
     {
-        _carRequest = carrequest;
-        visibleEdit = true;
+        await CheckUserExistence();
+        if (userExists)
+        {
+            NavManager.NavigateTo("/");
+        }
+
+        carDatas = await CarService.GetCarAsync();
+    }
+
+    private async Task CheckUserExistence()
+    {
+        int accessToken = await Authorize.CheckToken();
+        if (accessToken == 1)
+        {
+            userExists = true;
+        }
+    }
+
+    private void OpenDialogAdd()
+    {
+        if (userExists)
+        {
+            visibleAdd = true;
+        }
+        else
+        {
+            NavManager.NavigateTo("/login");
+            Snackbar.Add("You have to login first.", Severity.Warning, config => { config.ShowCloseIcon = false; config.VisibleStateDuration = 2000; config.ShowTransitionDuration = 500; config.HideTransitionDuration = 500; });
+        }
     }
 
     void CloseAdd() => visibleAdd = false;
-    void CloseEdit() => visibleEdit = false;
 
-    void SubmitAdd() => visibleAdd = false;
-    void SubmitEdit() => visibleEdit = false;
+    private async void SubmitAdd(Guid? id)
+    {
+        string message;
+        Severity type;
+        if (StartDate > EndDate || StartDate < DateTime.Today || StartDate == null || EndDate == null)
+        {
+            message = "Choose Valid Date";
+            type = Severity.Error;
+        }
+        else
+        {
+            visibleAdd = false;
+            string token = await Authorize.GetToken();
+            var result = await CarRequestService.RequestCar(StartDate, EndDate, id, token);
 
-    public string TextValue { get; set; }
-
+            if (result == null)
+            {
+                await Authorize.Logout();
+                message = "Session Expired. Please Login.";
+                type = Severity.Warning;
+                NavManager.NavigateTo("/login", forceLoad: true);
+            }
+            else if (result.Status == "Success")
+            {
+                message = "Car requested succesfully. We will update you soon.";
+                type = Severity.Success;
+            }
+            else
+            {
+                message = result.Message;
+                type = Severity.Warning;
+            }
+        }
+        Snackbar.Add(message, type, config => { config.ShowCloseIcon = false; config.VisibleStateDuration = 2000; config.ShowTransitionDuration = 500; config.HideTransitionDuration = 500; });
+    }
 
     private DialogOptions dialogOptions = new() { FullWidth = true };
+
     private async Task SubmitForm()
     {
         // Submit form logic goes here

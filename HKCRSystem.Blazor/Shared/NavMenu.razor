@@ -1,6 +1,8 @@
-﻿
+﻿@inject Blazored.LocalStorage.ILocalStorageService localStore
+@inject NavigationManager NavManager
+
 <MudNavMenu>
-    <MudNavLink Icon="@Icons.Material.Filled.Dashboard" Href="/" Match="NavLinkMatch.All">Dashboard</MudNavLink>
+    <MudNavLink Icon="@Icons.Material.Filled.Dashboard" Href="home" Match="NavLinkMatch.All">Dashboard</MudNavLink>
     <MudNavLink Icon="@Icons.Material.Rounded.PersonPin" Href="customers" Match="NavLinkMatch.Prefix">Customers</MudNavLink>
     <MudNavLink Icon="@Icons.Material.Filled.PersonAdd" Href="staff" Match="NavLinkMatch.Prefix">Staff</MudNavLink>
     <MudNavLink Icon="@Icons.Material.Filled.CarRental" Href="car" Match="NavLinkMatch.Prefix">Car</MudNavLink>
@@ -11,7 +13,16 @@
     <MudNavLink Icon="@Icons.Material.Filled.TurnRight" Href="return" Match="NavLinkMatch.Prefix">Return</MudNavLink>
     <MudNavGroup Icon="@Icons.Material.Filled.Settings" Title="Setting" Expanded="true">
         <MudNavLink Icon="@Icons.Material.Filled.Lock" Href="changePassword" Match="NavLinkMatch.Prefix">Change Password</MudNavLink>
-<MudNavLink Icon="@Icons.Material.Filled.Logout" Href="role" Match="NavLinkMatch.Prefix">Logout</MudNavLink>
-
+        <MudNavLink Icon="@Icons.Material.Filled.Logout" Match="NavLinkMatch.Prefix" OnClick=logoutHandle>Logout</MudNavLink>
     </MudNavGroup>
 </MudNavMenu>
+
+@code {
+    public async void logoutHandle()
+    {
+        await localStore.RemoveItemAsync("access");
+        await localStore.RemoveItemAsync("user");
+        await localStore.RemoveItemAsync("role");
+        NavManager.NavigateTo("/login", forceLoad: true);
+    }
+}

@@ -8,6 +8,8 @@
 @using HKCRSystem.Blazor.Data.Services
 @inject LoginService LoginService
 @inject Blazored.LocalStorage.ILocalStorageService localStore
+@inject ISnackbar Snackbar
+@inject Authorize Authorize
 
 <PageTitle>Login</PageTitle>
 
@@ -66,38 +68,65 @@
         </div>
 
     </div>
-   
-
 </EditForm>
 
 
 @code {
     RegisterAccountForm model = new RegisterAccountForm();
     bool success;
+    private bool userExists = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CheckUserExistence();
+        if (userExists)
+        {
+            NavManager.NavigateTo("/");
+        }
+    }
+
+    private async Task CheckUserExistence()
+    {
+        int accessToken = await Authorize.CheckToken();
+        if (accessToken == 1)
+        {
+            userExists = true;
+        }
+    }
 
     public class RegisterAccountForm
     {
-
         [Required]
         [EmailAddress]
         public string Email { get; set; }
 
-
-
         [Required]
         [StringLength(30, ErrorMessage = "Password must be at least 8 characters long.", MinimumLength = 8)]
         public string Password { get; set; }
-
-
-
     }
 
     private async void OnValidSubmit()
     {
         var result = await LoginService.UserLogin(model.Email, model.Password);
-        await localStore.SetItemAsync("access", result.Message);
+        if (result.Status == "Success")
+        {
+            var message = result.Message.Split(",");
+            await localStore.SetItemAsync("access", message[0]);
+            await localStore.SetItemAsync("user", Authorize.Encoder(message[1]));
+            await localStore.SetItemAsync("role", Authorize.Encoder(message[2]));
+            if(message[2] == "Customer")
+            {
+                NavManager.NavigateTo("/", forceLoad: true);
+            }
+            else
+            {
+                NavManager.NavigateTo("/home", forceLoad: true);
+            }
+        }
+        else
+        {
+            Snackbar.Add("Incorrect Username/Password!", Severity.Error, config => { config.ShowCloseIcon = false; config.VisibleStateDuration = 2000; config.ShowTransitionDuration = 500; config.HideTransitionDuration = 500; });
+        }
     }
-
-
 }
 

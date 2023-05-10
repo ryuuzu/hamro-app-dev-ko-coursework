@@ -1,4 +1,6 @@
 ﻿using HKCRSystem.Blazor.Data.DTO;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace HKCRSystem.Blazor.Data.Services
 {
@@ -11,20 +13,28 @@ namespace HKCRSystem.Blazor.Data.Services
             _httpClient = httpClient;
         }
 
-        public async Task<ResponseDTO> RequestCar(string startDate, string endDate, string carId, string token)
+        public async Task<ResponseDTO> RequestCar(DateTime? startDate, DateTime? endDate, Guid? carId, string token)
         {
             var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:7096/api/add/request");
             request.Headers.Add("Authorization", $"Bearer {token}");
+            var requestData = new
+            {
+                StartDate = startDate,
+                EndDate = endDate,
+                RequestedCarId = carId
+            };
 
-            var content = new MultipartFormDataContent();
-            content.Add(new StringContent(startDate), "endDate");
-            content.Add(new StringContent(endDate), "startDate");
-            content.Add(new StringContent(carId), "requestedCarId");
-            request.Content = content;
+            var json = JsonConvert.SerializeObject(requestData);
+            request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+
             var response = await _httpClient.SendAsync(request);
-            response.EnsureSuccessStatusCode();
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                return null;
+            }
             var result = await response.Content.ReadAsStringAsync();
-            return new ResponseDTO { Status = "Success", Message = result };
+            var resulta = JsonConvert.DeserializeObject<ResponseDTO>(result);
+            return resulta;
         }
 
         public async Task<ResponseDTO> CancelRequest(string requestId, string token)

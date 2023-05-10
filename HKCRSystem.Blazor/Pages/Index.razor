@@ -1,11 +1,13 @@
-@page "/"
+@page "/home"
 
 <PageTitle>Index</PageTitle>
 @using HKCRSystem.Blazor.Data
 @using HKCRSystem.Blazor.Data.DTO;
 @using HKCRSystem.Blazor.Data.Services
 @inject DashboardService DashboardService
-
+@using HKCRSystem.Blazor.Data.Services
+@inject Authorize Authorize
+@inject Blazored.LocalStorage.ILocalStorageService localStore
 
 <body id="page-top">
 
@@ -34,9 +36,9 @@
             <div class="d-flex align-items-end row">
                 <div class="col-sm-7">
                     <div class="card-body">
-                        <h5 class="card-title text-primary">Congratulations Khemraj! 🎉</h5>
+                        <h5 class="card-title text-primary">Welcome @userName 🎉</h5>
                         <p class="mb-4">
-                            Welcome <span class="fw-bold">Hamro Car Rental</span> System.
+                            Welcome to <span class="fw-bold">Hamro Car Rental</span> System.
                         </p>
 
                         <a href="#" class="btn btn-sm btn-outline-primary">View profile</a>
@@ -273,11 +275,16 @@
 
 
 @code {
+    private string userName;
+    private string role;
 
     private List<DashboardDTO>? dashboardDatas;
     //private bool FilterHandler(InventoryItem item) => SearchFilter(item, toSearch);
     protected override async Task OnInitializedAsync()
     {
+        var user = await localStore.GetItemAsync<string>("user");
+        userName = Authorize.Decoder(user);
+        role = Authorize.Decoder(await localStore.GetItemAsync<string>("role"));
         dashboardDatas = await DashboardService.GetDashboardAsync();
     }
 
