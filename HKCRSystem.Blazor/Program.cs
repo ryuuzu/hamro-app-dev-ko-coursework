@@ -16,6 +16,7 @@ builder.Services.AddMudServices();
 builder.Services.AddScoped<LoginService>();
 builder.Services.AddScoped<CarRequestService>();
 builder.Services.AddScoped<RegisterService>();
+builder.Services.AddScoped<PasswordService>();
 builder.Services.AddScoped<DamageService>();
 builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<UserManagementService>();

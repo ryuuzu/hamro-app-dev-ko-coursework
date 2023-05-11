@@ -4,8 +4,9 @@
 @using HKCRSystem.Blazor.Data.Services
 @inject CustomerService CustomerService
 @inject ISnackbar Snackbar
-<PageTitle>customers</PageTitle>
+@inject Authorize Authorize
 
+<PageTitle>customers</PageTitle>
 
 
 <MudContainer Class="mt-8 position-relative">
@@ -36,12 +37,12 @@
 
 
 @code {
-    // Global State of the Application
-
     private List<CustomerData>? customersDatas;
-    //private bool FilterHandler(InventoryItem item) => SearchFilter(item, toSearch);
+    
     protected override async Task OnInitializedAsync()
     {
-        customersDatas = await CustomerService.GetCustomerAsync();
+        string token = await Authorize.GetToken();
+
+        customersDatas = await CustomerService.GetCustomerAsync(token);
     }
 }

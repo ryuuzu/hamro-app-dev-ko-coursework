@@ -24,12 +24,13 @@
                     {
                         <a href="customerrequest" class="nav-item nav-link">Requests</a>
                         <a href="customerdamage" class="nav-item nav-link">Damages</a>
-                        <div class="nav-item dropdown" style="padding: 11px">
+                        <div class="nav-item dropdown pe-14" style="padding: 11px">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 @userName
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <button class="ps-1" onclick=@logoutHandle>Logout</button>
+                                <button class="ps-1 py-1" onclick=@logoutHandle>Logout</button>
+                                <a class="dropdown-item ps-1 text-black" href="changePassword">Change Password</a>
                                 <a class="dropdown-item ps-1 text-black" href="updateprofile">Update Profile</a>
                             </div>
                         </div>
@@ -60,11 +61,11 @@
     }
 
 
-        public async void logoutHandle()
-        {
-            await localStore.RemoveItemAsync("access");
-            await localStore.RemoveItemAsync("user");
-            await localStore.RemoveItemAsync("role");
-            NavManager.NavigateTo("/login", forceLoad: true);
-        }
+    public async void logoutHandle()
+    {
+        await localStore.RemoveItemAsync("access");
+        await localStore.RemoveItemAsync("user");
+        await localStore.RemoveItemAsync("role");
+        NavManager.NavigateTo("/login", forceLoad: true);
+    }
 }
