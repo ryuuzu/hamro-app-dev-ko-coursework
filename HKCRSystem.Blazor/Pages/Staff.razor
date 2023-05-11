@@ -12,11 +12,14 @@
 <PageTitle>staff</PageTitle>
 
 <MudContainer Class="mt-4 position-relative">
-    <div class="d-flex justify-content-end mb-2">
-        <MudButton OnClick="OpenDialogAdd" Variant="Variant.Filled" Color="Color.Primary">
-            Add Staff
-        </MudButton>
-    </div>
+    @if (userRole == "Admin")
+    {
+        <div class="d-flex justify-content-end mb-2">
+            <MudButton OnClick="OpenDialogAdd" Variant="Variant.Filled" Color="Color.Primary">
+                Add Staff
+            </MudButton>
+        </div>
+    }
     <MudTable FixedHeader="true" FixedFooter="true" Height="450px" Items="@staffsDatas" Hover="true" Striped="false">
         <ToolBarContent>
             <MudText Typo="Typo.h6">Staff</MudText>
@@ -37,10 +40,13 @@
             <MudTd DataLabel="Address">@context.Address</MudTd>
             <MudTd DataLabel="PhoneNo">@context.PhoneNumber</MudTd>
             <MudTd DataLabel="Role">@context.Role</MudTd>
-            <MudTd DataLabel="Actions">
-                <MudIconButton Icon="@Icons.Material.Filled.EditNote" Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick=@(()=>OpenDialogEdit(context)) aria-label="Edit"></MudIconButton>
-                <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" aria-label="delete" OnClick=@(()=>DeleteStaff(context.Id)) />
-            </MudTd>
+            @if (userRole == "Admin")
+            {
+                <MudTd DataLabel="Actions">
+                    <MudIconButton Icon="@Icons.Material.Filled.EditNote" Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick=@(()=>OpenDialogEdit(context)) aria-label="Edit"></MudIconButton>
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" aria-label="delete" OnClick=@(()=>DeleteStaff(context.Id)) />
+                </MudTd>
+            }
         </RowTemplate>
         <PagerContent>
             <MudTablePager />
@@ -138,9 +144,11 @@
     private string password;
     private string role;
 
+    private string userRole;
     protected override async Task OnInitializedAsync()
     {
         string token = await Authorize.GetToken();
+        userRole = await Authorize.GetRole();
         staffsDatas = await StaffService.GetStaffAsync(token);
     }
 

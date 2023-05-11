@@ -8,6 +8,6 @@
         public double Price { get; set; }
         public string? Status { get; set; }
         public bool IsAvailable { get; set; }
-        public Guid CreatedBy { get; set; }
+        public string CreatedBy { get; set; }
     }
 }

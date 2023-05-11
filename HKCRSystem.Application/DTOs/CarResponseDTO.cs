@@ -15,6 +15,6 @@ namespace HKCRSystem.Application.DTOs
         public string? Status { get; set; }
         public bool IsAvailable { get; set; }
         public int TimesRented { get; set; }
-        public Guid CreatedBy { get; set; }
+        public string? CreatedBy { get; set; }
     }
 }

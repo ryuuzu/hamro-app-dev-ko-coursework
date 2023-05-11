@@ -66,7 +66,7 @@ namespace HKCRSystem.Infrastructure.Services
                             Price = o.Price,
                             Status = o.Status,
                             IsAvailable = !activeCarRequests.Any(),
-                            CreatedBy = o.CreatedBy,
+                            CreatedBy = users.FirstOrDefault(u => u.Id == o.CreatedBy.ToString())?.FirstName,
                             TimesRented = enumerable.Length
                         };
                     }).ToList()
