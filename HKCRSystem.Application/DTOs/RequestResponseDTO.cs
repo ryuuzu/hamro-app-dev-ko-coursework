@@ -8,6 +8,7 @@ public class RequestResponseDTO
     public DateTime EndDate { get; set; }
     public float Discount { get; set; }
     public bool IsCancelled { get; set; }
+    public bool IsApproved { get; set; }
     public Guid RequestedCarId { get; set; }
     public string RequestedCar { get; set; }
     public string RequestedById { get; set; }

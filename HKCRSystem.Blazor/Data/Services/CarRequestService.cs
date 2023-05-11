@@ -28,7 +28,7 @@ namespace HKCRSystem.Blazor.Data.Services
             request.Content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await _httpClient.SendAsync(request);
-            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
             {
                 return null;
             }
@@ -37,15 +37,19 @@ namespace HKCRSystem.Blazor.Data.Services
             return resulta;
         }
 
-        public async Task<ResponseDTO> CancelRequest(string requestId, string token)
+        public async Task<ResponseDTO> CancelRequest(Guid requestId, string token)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, $"https://localhost:7096/api/cancel/request/{requestId}");
             request.Headers.Add("Authorization", $"Bearer {token}");
 
             var response = await _httpClient.SendAsync(request);
-            response.EnsureSuccessStatusCode();
+            if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                return null;
+            }
             var result = await response.Content.ReadAsStringAsync();
-            return new ResponseDTO { Status = "Success", Message = result };
+            var resulta = JsonConvert.DeserializeObject<ResponseDTO>(result);
+            return resulta;
         }
 
         public async Task<ResponseDTO> ApproveRequest(string requestId, string token)

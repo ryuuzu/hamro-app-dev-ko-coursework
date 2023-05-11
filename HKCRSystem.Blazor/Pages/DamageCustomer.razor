@@ -38,20 +38,16 @@
 </MudContainer>
 
 
-
-
-
-
 @code {
     // Global State of the Application
 
-    private List<DamageDTO>? damagesDatas;
+    private List<DamageDTO>? damagesDatas = new List<DamageDTO>();
     //private bool FilterHandler(InventoryItem item) => SearchFilter(item, toSearch);
  
     protected override async Task OnInitializedAsync()
     {
        
-          damagesDatas = await DamageCustomerService.GetDamageCustomerAsync();
+          //damagesDatas = await DamageCustomerService.GetDamageCustomerAsync();
      
     }
     }

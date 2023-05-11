@@ -1,4 +1,5 @@
 ﻿using HKCRSystem.Blazor.Data.DTO;
+using Newtonsoft.Json;
 
 namespace HKCRSystem.Blazor.Data.Services
 {
@@ -12,15 +13,19 @@ namespace HKCRSystem.Blazor.Data.Services
             _httpClient = httpClient;
         }
 
-        public async Task<ResponseDTO> CreatePayment(string billingId, string token)
+        public async Task<ResponseDTO> CreatePayment(Guid billingId, string token)
         {
             var request = new HttpRequestMessage(HttpMethod.Post, $"https://localhost:7096/api/payment/{billingId}");
             request.Headers.Add("Authorization", $"Bearer {token}");
             var response = await _httpClient.SendAsync(request);
-            response.EnsureSuccessStatusCode();
+            if(response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                return null;
+            }
             var result = await response.Content.ReadAsStringAsync();
 
-            return new ResponseDTO { Status = "Success", Message = result };
+            var resulta = JsonConvert.DeserializeObject<ResponseDTO>(result);
+            return resulta;
         }
     }
 }

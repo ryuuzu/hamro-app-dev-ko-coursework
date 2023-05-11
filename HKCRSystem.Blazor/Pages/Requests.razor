@@ -3,8 +3,13 @@
 @using HKCRSystem.Blazor.Data
 @using HKCRSystem.Blazor.Data.DTO;
 @using HKCRSystem.Blazor.Data.Services
+@using Newtonsoft.Json
 @inject RequestCustomerService RequestCustomerService
+@inject CarRequestService CarRequestService
 @inject ISnackbar Snackbar
+@inject Authorize Authorize
+@inject NavigationManager NavManager
+@inject PaymentService Payment
 
 <PageTitle>Request</PageTitle>
 
@@ -13,7 +18,7 @@
     </div>
     <MudTable FixedHeader="true" FixedFooter="true" Height="450px" Items="@requestsDatas" Hover="true" Striped="false">
         <ToolBarContent>
-            <MudText Typo="Typo.h6">User Rent Requests</MudText>
+            <MudText Typo="Typo.h6">Your Car Rent Requests</MudText>
         </ToolBarContent>
         <HeaderContent>
             <MudTh><MudTableSortLabel SortBy="new Func<RequestDTO, object>(RequestDTO => RequestDTO.RequestedCar)">Requested Car</MudTableSortLabel></MudTh>
@@ -32,12 +37,20 @@
             <MudTd DataLabel="End Date">@context.EndDate.ToString("MM/dd/yyyy")</MudTd>
             <MudTd DataLabel="Discount">@context.Discount</MudTd>
             <MudTd DataLabel="Price">@context.Price</MudTd>
-            <MudTd DataLabel="Cancelled">@context.IsCancelled </MudTd>
-            <MudTd DataLabel="Approved By">@context.ApprovedBy</MudTd>
+            <MudTd DataLabel="Status">@(context.IsCancelled ? "Cancelled" : context.IsApproved ? "Approved" : !context.IsApproved || context.ApprovedById == token ? "Pending" : "Denied")</MudTd>
+            <MudTd DataLabel="Approved By">
+                @(context.IsApproved ? context.ApprovedBy : "-")
+                </MudTd>
             <MudTd DataLabel="Billing Id">@context.BillingId</MudTd>
             <MudTd DataLabel="Actions">
-                <MudIconButton Icon="@Icons.Material.Filled.EditNote" Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick=@(()=>OpenDialogEdit(context)) aria-label="Edit"></MudIconButton>
-                <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" aria-label="delete" />
+                @if (!context.IsCancelled)
+                {
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" aria-label="delete" OnClick="() => CancelRequest(context.Id)"/>
+                }
+                @if (context.IsApproved)
+                {
+                    <MudIconButton Icon="@Icons.Material.Filled.Payment" Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" aria-label="delete" OnClick="() => MakePayment(context.BillingId)" />
+                }
             </MudTd>
         </RowTemplate>
         <PagerContent>
@@ -46,90 +59,25 @@
     </MudTable>
 </MudContainer>
 
-<MudDialog @bind-IsVisible="visibleAdd" Options="dialogOptions">
-    <TitleContent>
-        <MudText Typo="Typo.h6">
-            <MudIcon Icon="@Icons.Material.Filled.Person" Class="mr-3" /> Add request
-        </MudText>
-    </TitleContent>
-    <DialogContent>
-        <MudGrid>
-            <MudItem xs="6">
-                <MudTextField @bind-Value="TextValue" Label="Price" Variant="Variant.Outlined"></MudTextField>
-            </MudItem>
-            <MudItem xs="6">
-                <MudTextField @bind-Value="TextValue" Label="Discount" Variant="Variant.Outlined"></MudTextField>
-            </MudItem>
-            <MudItem xs="6">
-                <MudTextField @bind-Value="TextValue" Label="StartDate" Variant="Variant.Outlined"></MudTextField>
-            </MudItem>
-            <MudItem xs="6">
-                <MudTextField @bind-Value="TextValue" Label="EndDate" Variant="Variant.Outlined"></MudTextField>
-            </MudItem>
-            <MudItem xs="6">
-                <MudTextField @bind-Value="TextValue" Label="IsCancelled" Variant="Variant.Outlined"></MudTextField>
-            </MudItem>
-            <MudItem xs="6">
-                <MudTextField @bind-Value="TextValue" Label="RequestedCar" Variant="Variant.Outlined"></MudTextField>
-            </MudItem>
-            <MudItem xs="6">
-                <MudTextField @bind-Value="TextValue" Label="ApprovedBy" Variant="Variant.Outlined"></MudTextField>
-            </MudItem>
-            <MudItem xs="6">
-                <MudTextField @bind-Value="TextValue" Label="BillingId" Variant="Variant.Outlined"></MudTextField>
-            </MudItem>
-        </MudGrid>
-
-    </DialogContent>
-    <DialogActions>
-        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Color="Color.Info" Size="Size.Small" OnClick="SubmitAdd">Save</MudButton>
-        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" Size="Size.Small" OnClick="CloseAdd">Close</MudButton>
-    </DialogActions>
-</MudDialog>
-
-<MudDialog @bind-IsVisible="visibleEdit" Options="dialogOptions">
-    <TitleContent>
-        <MudText Typo="Typo.h6">
-            <MudIcon Icon="@Icons.Material.Filled.Person" Class="mr-3" /> Edit request
-        </MudText>
-    </TitleContent>
-    <DialogContent>
-        <MudGrid>
-            <MudItem xs="12">
-                <MudTextField @bind-Value=@_carRequest.StartDate Label ="Start Date" Variant="Variant.Outlined" HelperText="DD/MM/YYYY"></MudTextField>
-            </MudItem>
-            <MudItem xs="12">
-                <MudTextField @bind-Value=@_carRequest.EndDate Label="Endate" Variant="Variant.Outlined" HelperText="DD/MM/YYYY"></MudTextField>
-            </MudItem>
-        </MudGrid>
-
-    </DialogContent>
-    <DialogActions>
-        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Color="Color.Info" Size="Size.Small" OnClick="SubmitEdit">Save</MudButton>
-        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" Size="Size.Small" OnClick="CloseEdit">Close</MudButton>
-    </DialogActions>
-</MudDialog>
-
-
 @code {
-
-
-    private List<RequestDTO>? requestsDatas;
-    //private bool FilterHandler(InventoryItem item) => SearchFilter(item, toSearch);
-    protected override async Task OnInitializedAsync()
-    {
-    
-        requestsDatas = await RequestCustomerService.GetRequestCustomerAsync();
-      
-    }
-
- 
-
+    private string token;
     private bool visibleAdd;
     private bool visibleEdit;
 
+    private string message;
+    private Severity type;
+    private List<RequestDTO>? requestsDatas = new List<RequestDTO>();
     private RequestDTO _carRequest { get; set; }
 
+    protected override async Task OnInitializedAsync()
+    {
+        token = await Authorize.GetToken();
+        if(token == null)
+        {
+            NavManager.NavigateTo("/login", forceLoad: true);
+        }
+        requestsDatas = await RequestCustomerService.GetRequestCustomerAsync(token);
+    }
 
     private void OpenDialogEdit(RequestDTO carrequest)
     {
@@ -137,19 +85,56 @@
         visibleEdit = true;
     }
 
-    void CloseAdd() => visibleAdd = false;
-    void CloseEdit() => visibleEdit = false;
-
-    void SubmitAdd() => visibleAdd = false;
-    void SubmitEdit() => visibleEdit = false;
-
-    public string TextValue { get; set; }
-
-
-    private DialogOptions dialogOptions = new() { FullWidth = true };
-    private async Task SubmitForm()
+    private async void CancelRequest(Guid id)
     {
-        // Submit form logic goes here
+        token = await Authorize.GetToken();
+        var result = await CarRequestService.CancelRequest(id, token);
+
+        if (result == null)
+        {
+            await Authorize.Logout();
+            message = "Session Expired. Please Login.";
+            type = Severity.Warning;
+            NavManager.NavigateTo("/login", forceLoad: true);
+        }
+        else if (result.Status == "Success")
+        {
+            message = result.Message;
+            type = Severity.Success;
+        }
+        else
+        {
+            message = result.Message;
+            type = Severity.Warning;
+        }
+        Snackbar.Add(message, type, config => { config.ShowCloseIcon = false; config.VisibleStateDuration = 2000; config.ShowTransitionDuration = 500; config.HideTransitionDuration = 500; });
     }
 
+    private async void MakePayment(Guid id)
+    {
+        token = await Authorize.GetToken();
+        var result = await Payment.CreatePayment(id, token);
+        if (result == null)
+        {
+            await Authorize.Logout();
+            message = "Session Expired. Please Login.";
+            type = Severity.Warning;
+            NavManager.NavigateTo("/login", forceLoad: true);
+        }
+        else if (result.Status == "Success")
+        {
+            //Deserialize the JSON response
+            var responseObject = JsonConvert.DeserializeObject<dynamic>(result.Message);
+            //Access the payment_url property
+            string paymentUrl = responseObject.payment_url;
+            NavManager.NavigateTo(paymentUrl);
+
+        }
+        else
+        {
+            message = result.Message;
+            type = Severity.Warning;
+        }
+        Snackbar.Add(message, type, config => { config.ShowCloseIcon = false; config.VisibleStateDuration = 2000; config.ShowTransitionDuration = 500; config.HideTransitionDuration = 500; });
+    }
   }

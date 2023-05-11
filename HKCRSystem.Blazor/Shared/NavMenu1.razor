@@ -26,7 +26,7 @@
                         <a href="customerdamage" class="nav-item nav-link">Damages</a>
                         <div class="nav-item dropdown" style="padding: 11px">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                User
+                                @userName
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <button class="ps-1" onclick=@logoutHandle>Logout</button>
@@ -42,6 +42,7 @@
 
 @code {
     private bool userExists = false;
+    private string userName;
 
     protected override async Task OnInitializedAsync()
     {
@@ -55,6 +56,7 @@
         {
             userExists = true;
         }
+        userName = await Authorize.GetUser();
     }
 
 
