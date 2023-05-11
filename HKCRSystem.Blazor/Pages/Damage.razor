@@ -4,6 +4,9 @@
 @using HKCRSystem.Blazor.Data.Services
 @inject DamageService DamageService
 @inject ISnackbar Snackbar
+@inject Authorize Authorize
+@inject NavigationManager NavManager
+
 <PageTitle>damage</PageTitle>
 
 
@@ -43,62 +46,71 @@
 <MudDialog @bind-IsVisible="visibleEdit" Options="dialogOptions">
     <TitleContent>
         <MudText Typo="Typo.h6">
-            <MudIcon Icon="@Icons.Material.Filled.Person" Class="mr-3" /> Update Damage
+            <MudIcon Icon="@Icons.Material.Filled.Person" Class="mr-3" /> Update Damage Price
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudGrid>
-            <MudItem xs="12">
-                <MudTextField @bind-Value=@_damageData.Description Label="Description" Variant="Variant.Outlined"></MudTextField>
-            </MudItem>
+        <MudGrid Style="justify-content:center!important">
             <MudItem xs="6">
-                <MudTextField @bind-Value=@_damageData.DamagedCar Label="DamagedCar" Variant="Variant.Outlined"></MudTextField>
+                <MudTextField @bind-Value=@_damageData.Price Label="Price" Variant="Variant.Outlined" InputType="InputType.Number"></MudTextField>
             </MudItem>
-            <MudItem xs="6">
-                <MudTextField @bind-Value=@_damageData.Price Label="Price" Variant="Variant.Outlined"></MudTextField>
-            </MudItem>
-            <MudItem xs="6">
-                <MudTextField @bind-Value=@_damageData.DamageDate Label="DamageDate" Variant="Variant.Outlined"></MudTextField>
-            </MudItem>
-            <MudItem xs="6">
-                <MudTextField @bind-Value=@_damageData.ReportedDate Label="ReportedDate" Variant="Variant.Outlined"></MudTextField>
-            </MudItem>
-            <MudItem xs="6">
-                <MudTextField @bind-Value=@_damageData.RequestedBy Label="RequestedBy" Variant="Variant.Outlined"></MudTextField>
-            </MudItem>
-            <MudItem xs="6">
-                <MudTextField @bind-Value=@_damageData.ReviewedBy Label="ReviewedBy" Variant="Variant.Outlined"></MudTextField>
-            </MudItem>
-            
         </MudGrid>
 
     </DialogContent>
     <DialogActions>
-        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Color="Color.Info" Size="Size.Small" OnClick="SubmitEdit">Save</MudButton>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Color="Color.Info" Size="Size.Small" OnClick="UpdateDamage">Save</MudButton>
         <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" Size="Size.Small" OnClick="CloseEdit">Close</MudButton>
     </DialogActions>
 </MudDialog>
 
 
 @code {
-    // Global State of the Application
-
     private List<DamageData>? damagesDatas;
+
     protected override async Task OnInitializedAsync()
     {
-       
-          damagesDatas = await DamageService.GetDamageAsync();
-     
+        string token = await Authorize.GetToken();
+        damagesDatas = await DamageService.GetDamageAsync(token);
     }
+
     private bool visibleEdit;
     private DamageData _damageData { get; set; }
+
     private void OpenDialogEdit(DamageData damagedata)
     {
         _damageData = damagedata;
         visibleEdit = true;
     }
-    void SubmitEdit() => visibleEdit = false;
+
+    public async void UpdateDamage()
+    {
+        string message;
+        visibleEdit = false;
+        Severity type;
+        string token = await Authorize.GetToken();
+        var result = await DamageService.UpdateDamage(_damageData.Id.ToString(), _damageData.Price, token);
+
+        if (result == null)
+        {
+            await Authorize.Logout();
+            message = "Session Expired. Please Login.";
+            type = Severity.Warning;
+            NavManager.NavigateTo("/login", forceLoad: true);
+        }
+        else if (result.Status == "Success")
+        {
+            message = result.Message;
+            type = Severity.Success;
+        }
+        else
+        {
+            message = result.Message;
+            type = Severity.Warning;
+        }
+        Snackbar.Add(message, type, config => { config.ShowCloseIcon = false; config.VisibleStateDuration = 2000; config.ShowTransitionDuration = 500; config.HideTransitionDuration = 500; });
+    }
     void CloseEdit() => visibleEdit = false;
+
     private DialogOptions dialogOptions = new() { FullWidth = true };
     private async Task SubmitForm()
     {
