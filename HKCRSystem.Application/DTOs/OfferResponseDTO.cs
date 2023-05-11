@@ -23,6 +23,6 @@ namespace HKCRSystem.Application.DTOs
 
         public float DiscountPercent { get; set; }
 
-        public string CreatedBy { get; set; }
+        public string? CreatedBy { get; set; }
     }
 }

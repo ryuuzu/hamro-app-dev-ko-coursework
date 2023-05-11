@@ -34,8 +34,8 @@ namespace HKCRSystem.Infrastructure.Services
             {
                 Name = model.Name,
                 Message = model.Message,
-                StartDate = model.StartDate,
-                EndDate = model.EndDate,
+                StartDate = model.StartDate.ToUniversalTime(),
+                EndDate = model.EndDate.ToUniversalTime(),
                 Type = model.Type,
                 DiscountPercent = model.DiscountPercent,
                 CreatedBy = Guid.Parse(id),
@@ -76,17 +76,19 @@ namespace HKCRSystem.Infrastructure.Services
             {
                 var thisOfferModel = new OfferResponseDTO();
                 var user = await _userManager.FindByIdAsync(offer.CreatedBy.ToString());
+                if (!offer.IsDeleted)
+                {
+                    thisOfferModel.Id = offer.Id;
+                    thisOfferModel.Name = offer.Name;
+                    thisOfferModel.Message = offer.Message;
+                    thisOfferModel.StartDate = offer.StartDate;
+                    thisOfferModel.EndDate = offer.EndDate;
+                    thisOfferModel.Type = offer.Type;
+                    thisOfferModel.DiscountPercent = offer.DiscountPercent;
+                    thisOfferModel.CreatedBy = $"{user.FirstName} {user.LastName}";
 
-                thisOfferModel.Id = offer.Id;
-                thisOfferModel.Name = offer.Name;
-                thisOfferModel.Message = offer.Message;
-                thisOfferModel.StartDate = offer.StartDate;
-                thisOfferModel.EndDate = offer.EndDate;
-                thisOfferModel.Type = offer.Type;
-                thisOfferModel.DiscountPercent = offer.DiscountPercent;
-                thisOfferModel.CreatedBy = $"{user.FirstName} {user.LastName}";
-
-                offerModel.Add(thisOfferModel);
+                    offerModel.Add(thisOfferModel);
+                }
             }
             //returns list
             return offerModel;

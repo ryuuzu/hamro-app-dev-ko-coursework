@@ -5,6 +5,8 @@
 @using HKCRSystem.Blazor.Data.Services
 @inject OfferService OfferService
 @inject ISnackbar Snackbar
+@inject Authorize Authorize
+@inject NavigationManager NavManager
 
 <PageTitle>offers</PageTitle>
 
@@ -21,7 +23,7 @@
         <HeaderContent>
             <MudTh><MudTableSortLabel SortBy="new Func<OfferData, object>(OfferData => OfferData.Name)">Name</MudTableSortLabel></MudTh>
             <MudTh>Message</MudTh>
-            @*<MudTh>Type</MudTh>*@
+            <MudTh>Type</MudTh>
             <MudTh>Discount(%)</MudTh>
             <MudTh>Start Date</MudTh>
             <MudTh>End Date</MudTh>
@@ -31,7 +33,7 @@
         <RowTemplate>
             <MudTd DataLabel="Name">@context.Name</MudTd>
             <MudTd DataLabel="Message">@context.Message</MudTd>
-            @*<MudTd DataLabel="Type">@context.Type</MudTd>*@
+            <MudTd DataLabel="Type">@context.Type</MudTd>
             <MudTd DataLabel="Discount(%)">@context.DiscountPercent</MudTd>
             <MudTd DataLabel="Start Date">@context.StartDate</MudTd>
             <MudTd DataLabel="End Date">@context.EndDate</MudTd>
@@ -39,7 +41,7 @@
 
             <MudTd DataLabel="Actions">
                 <MudIconButton Icon="@Icons.Material.Filled.EditNote" Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick=@(()=>OpenDialogEdit(context)) aria-label="Edit"></MudIconButton>
-                <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" aria-label="delete" />
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" aria-label="delete" OnClick=@(()=>DeleteOffer(context.Id.ToString())) />
             </MudTd>
         </RowTemplate>
         <PagerContent>
@@ -56,37 +58,24 @@
     </TitleContent>
     <DialogContent>
         <MudGrid>
-            <MudItem xs="6">
-                <MudTextField @bind-Value="TextValue" Label="Name" Variant="Variant.Outlined"></MudTextField>
+            <MudItem xs="12">
+                <MudTextField @bind-Value="name" Label="Name" Variant="Variant.Outlined"></MudTextField>
             </MudItem>
             <MudItem xs="6">
-                <MudTextField @bind-Value="TextValue" Label="Message" Variant="Variant.Outlined"></MudTextField>
-            </MudItem>
-            
-           @* <MudItem xs="6">
-                <MudTextField @bind-Value="TextValue" Label="Type" Variant="Variant.Outlined"></MudTextField>
-            </MudItem>*@
-            <MudItem xs="6">
-                <MudTextField @bind-Value="TextValue" Label="Discount" Variant="Variant.Outlined"></MudTextField>
+                <MudTextField @bind-Value="offerType" Label="Type" Variant="Variant.Outlined"></MudTextField>
             </MudItem>
             <MudItem xs="6">
-                <MudTextField @bind-Value="TextValue" Label="CreatedBy" Variant="Variant.Outlined"></MudTextField>
+                <MudTextField @bind-Value="discount" Label="Discount" Variant="Variant.Outlined" InputType="InputType.Number"></MudTextField>
             </MudItem>
             <MudItem xs="6">
-                <MudTextField @bind-Value="TextValue" Label="Start Date" Variant="Variant.Outlined"></MudTextField>
+                <MudDatePicker @bind-Date="startDate" Label="Start Date" Variant="Variant.Outlined" />
             </MudItem>
             <MudItem xs="6">
-                <MudTextField @bind-Value="TextValue" Label="End Date" Variant="Variant.Outlined"></MudTextField>
+                <MudDatePicker @bind-Date="endDate" Label="End Date" Variant="Variant.Outlined" />
             </MudItem>
-          
-           
-        @*    <MudItem xs="6">
-                <MudSelect T="string" Label="Role" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                    <MudSelectItem T="string" Value="@("Admin")" />
-                    <MudSelectItem T="string" Value="@("Staff")" />
-                </MudSelect>
-            </MudItem>*@
-
+            <MudItem xs="12">
+                <MudTextField @bind-Value="offerMessage" Label="Message" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
         </MudGrid>
 
     </DialogContent>
@@ -104,20 +93,14 @@
     </TitleContent>
     <DialogContent>
         <MudGrid>
-            <MudItem xs="6">
+            <MudItem xs="12">
                 <MudTextField @bind-Value=@_offerData.Name Label="Name" Variant="Variant.Outlined"></MudTextField>
             </MudItem>
             <MudItem xs="6">
-                <MudTextField @bind-Value=@_offerData.Message Label="Message" Variant="Variant.Outlined"></MudTextField>
-            </MudItem>
-           @* <MudItem xs="6">
-                <MudTextField @bind-Value=@_offerData.Type Label="Type" Variant="Variant.Outlined"></MudTextField>
-            </MudItem>*@
-            <MudItem xs="6">
-                <MudTextField @bind-Value=@_offerData.DiscountPercent Label="Discount" Variant="Variant.Outlined"></MudTextField>
+            <MudTextField @bind-Value=@_offerData.Type Label="Type" Variant="Variant.Outlined"></MudTextField>
             </MudItem>
             <MudItem xs="6">
-                <MudTextField @bind-Value=@_offerData.CreatedBy Label="CreatedBy" Variant="Variant.Outlined"></MudTextField>
+                <MudTextField @bind-Value=@_offerData.DiscountPercent Label="Discount" Variant="Variant.Outlined" InputType="InputType.Number"></MudTextField>
             </MudItem>
             <MudItem xs="6">
                 <MudTextField @bind-Value=@_offerData.StartDate Label="StartDate" Variant="Variant.Outlined"></MudTextField>
@@ -125,13 +108,9 @@
             <MudItem xs="6">
                 <MudTextField @bind-Value=@_offerData.EndDate Label="EndData" Variant="Variant.Outlined"></MudTextField>
             </MudItem>
-         
-           @*<MudItem xs="6">
-                <MudSelect T="string" @bind-Value=@_offerData.Role Label="Role" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                    <MudSelectItem T="string" Value="@("Admin")" />
-                    <MudSelectItem T="string" Value="@("Staff")" />
-                </MudSelect>
-            </MudItem>*@
+            <MudItem xs="12">
+                <MudTextField @bind-Value=@_offerData.Message Label="Message" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
         </MudGrid>
 
     </DialogContent>
@@ -142,11 +121,19 @@
 </MudDialog>
 
 
-@code{
+@code {
     private List<OfferData>? offersDatas;
+    private string name;
+    private string offerMessage;
+    private string offerType;
+    private float discount;
+    public DateTime? startDate { get; set; }
+    public DateTime? endDate { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
-        offersDatas = await OfferService.GetOfferAsync();
+        string token = await Authorize.GetToken();
+        offersDatas = await OfferService.GetOfferAsync(token);
     }
     private bool visibleAdd;
     private bool visibleEdit;
@@ -164,15 +151,100 @@
     void CloseAdd() => visibleAdd = false;
     void CloseEdit() => visibleEdit = false;
 
-    void SubmitAdd() => visibleAdd = false;
-    void SubmitEdit() => visibleEdit = false;
-
     public string TextValue { get; set; }
 
+    public async void SubmitAdd()
+    {
+        string message;
+        Severity type;
+        if (startDate > endDate || startDate < DateTime.Today || startDate == null || endDate == null)
+        {
+            message = "Choose Valid Date";
+            type = Severity.Error;
+        }
+        visibleAdd = false;
+        string token = await Authorize.GetToken();
+        var result = await OfferService.AddOffer(name, offerMessage, startDate, endDate, offerType, discount, token);
+
+        if (result == null)
+        {
+            await Authorize.Logout();
+            message = "Session Expired. Please Login.";
+            type = Severity.Warning;
+            NavManager.NavigateTo("/login", forceLoad: true);
+        }
+        else if (result.Status == "Success")
+        {
+            message = result.Message;
+            type = Severity.Success;
+        }
+        else
+        {
+            message = result.Message;
+            type = Severity.Warning;
+        }
+        Snackbar.Add(message, type, config => { config.ShowCloseIcon = false; config.VisibleStateDuration = 2000; config.ShowTransitionDuration = 500; config.HideTransitionDuration = 500; });
+    }
+
+    public async void SubmitEdit()
+    {
+        string message;
+        Severity type;
+        if (startDate > endDate || startDate < DateTime.Today || startDate == null || endDate == null)
+        {
+            message = "Choose Valid Date";
+            type = Severity.Error;
+        }
+        visibleEdit = false;
+        string token = await Authorize.GetToken();
+        var result = await OfferService.UpdateOffer(_offerData.Id, _offerData.Name, _offerData.Message, _offerData.StartDate, _offerData.EndDate, _offerData.Type, _offerData.DiscountPercent, token);
+
+        if (result == null)
+        {
+            await Authorize.Logout();
+            message = "Session Expired. Please Login.";
+            type = Severity.Warning;
+            NavManager.NavigateTo("/login", forceLoad: true);
+        }
+        else if (result.Status == "Success")
+        {
+            message = result.Message;
+            type = Severity.Success;
+        }
+        else
+        {
+            message = result.Message;
+            type = Severity.Warning;
+        }
+        Snackbar.Add(message, type, config => { config.ShowCloseIcon = false; config.VisibleStateDuration = 2000; config.ShowTransitionDuration = 500; config.HideTransitionDuration = 500; });
+    }
+
+    public async void DeleteOffer(string id)
+    {
+        string message;
+        Severity type;
+        string token = await Authorize.GetToken();
+        var result = await OfferService.DeleteOffer(id, token);
+
+        if (result == null)
+        {
+            await Authorize.Logout();
+            message = "Session Expired. Please Login.";
+            type = Severity.Warning;
+            NavManager.NavigateTo("/login", forceLoad: true);
+        }
+        else if (result.Status == "Success")
+        {
+            message = result.Message;
+            type = Severity.Success;
+        }
+        else
+        {
+            message = result.Message;
+            type = Severity.Warning;
+        }
+        Snackbar.Add(message, type, config => { config.ShowCloseIcon = false; config.VisibleStateDuration = 2000; config.ShowTransitionDuration = 500; config.HideTransitionDuration = 500; });
+    }
 
     private DialogOptions dialogOptions = new() { FullWidth = true };
-    private async Task SubmitForm()
-    {
-        // Submit form logic goes here
-    }
 }
