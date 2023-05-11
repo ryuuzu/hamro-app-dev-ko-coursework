@@ -2,6 +2,8 @@
 
 @using HKCRSystem.Blazor.Data.Services
 @inject Authorize Authorize
+@inject Blazored.LocalStorage.ILocalStorageService localStore
+@inject NavigationManager NavManager
 
 <MudThemeProvider />
 <MudDialogProvider />
@@ -23,7 +25,7 @@ else
             <MudText Style="width:100%; text-align:end">@userName</MudText>
             <MudMenu Icon="@Icons.Material.Filled.Person" Color="Color.Inherit" aria-label="Person">
                 <MudMenuItem Icon="@Icons.Material.Filled.Security" IconColor="Color.Primary" Href="/changePassword">Security</MudMenuItem>
-                <MudMenuItem Icon="@Icons.Material.Filled.Logout" IconColor="Color.Error">Logout</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Filled.Logout" IconColor="Color.Error" OnClick="logoutHandle">Logout</MudMenuItem>
             </MudMenu>
         </MudAppBar>
         <MudDrawer @bind-Open="_drawerOpen" Elevation="2">
@@ -66,5 +68,13 @@ else
 
         userName = await Authorize.GetUser();
         role = await Authorize.GetRole();
+    }
+
+    public async void logoutHandle()
+    {
+        await localStore.RemoveItemAsync("access");
+        await localStore.RemoveItemAsync("user");
+        await localStore.RemoveItemAsync("role");
+        NavManager.NavigateTo("/login", forceLoad: true);
     }
 }

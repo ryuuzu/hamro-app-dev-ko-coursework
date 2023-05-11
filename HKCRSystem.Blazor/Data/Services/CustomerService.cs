@@ -1,22 +1,32 @@
 ﻿using HKCRSystem.Blazor.Data.DTO;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Net.Http.Headers;
+using System.Net;
 
 namespace HKCRSystem.Blazor.Data.Services
 {
     public class CustomerService
     {
         private readonly HttpClient _httpClient;
-        private string baseUrl = "https://localhost:7284/";
         public CustomerService(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
 
-        public async Task<List<CustomerData>?> GetCustomerAsync()
+        public async Task<List<CustomerData>?> GetCustomerAsync(string token)
         {
-            var response = await _httpClient.GetAsync("https://localhost:7284/api/get/customer");
+            var request = new HttpRequestMessage(HttpMethod.Get, "https://localhost:7096/api/user/get/customer");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var result = response.Content.ReadAsStringAsync().Result;
+            var response = await _httpClient.SendAsync(request);
+            var result = await response.Content.ReadAsStringAsync();
+
+            if (response.StatusCode == HttpStatusCode.Forbidden)
+            {
+                return null;
+            }
+
             var rr = JsonConvert.DeserializeObject<List<CustomerData>>(result);
             return rr;
         }
