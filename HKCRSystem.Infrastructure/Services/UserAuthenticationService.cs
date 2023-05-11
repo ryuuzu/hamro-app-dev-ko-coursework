@@ -74,7 +74,7 @@ namespace HKCRSystem.Infrastructure.Services
             {
                 var userDetail = await _userManager.FindByEmailAsync(model.Email);
                 //saves the file
-                await PostAttachment(file, model.Description, model.Type, userDetail.Id);
+                await PostAttachment(file, model.Description, model.Type, user.Id);
             }
 
             if (!result.Succeeded)

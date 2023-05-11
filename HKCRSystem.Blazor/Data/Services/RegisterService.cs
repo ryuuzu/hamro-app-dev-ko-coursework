@@ -1,6 +1,7 @@
 ﻿using HKCRSystem.Blazor.Data.DTO;
 using Microsoft.AspNetCore.Components.Forms;
 using Newtonsoft.Json;
+using System.Net.Http.Headers;
 using System.Text.Json.Serialization;
 
 namespace HKCRSystem.Blazor.Data.Services
@@ -15,7 +16,7 @@ namespace HKCRSystem.Blazor.Data.Services
         }
 
         public async Task<ResponseDTO?> RegisterUser(string firstName, string lastName, string email,
-            string phoneNumber, string address, string password, Stream? document)
+            string phoneNumber, string address, string password, IBrowserFile? document)
         {
             var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:7096/api/auth/register");
             var content = new MultipartFormDataContent();
@@ -25,7 +26,10 @@ namespace HKCRSystem.Blazor.Data.Services
             content.Add(new StringContent(phoneNumber), "PhoneNumber");
             content.Add(new StringContent(address), "Address");
             content.Add(new StringContent(password), "Password");
-            content.Add(new StreamContent(document), "file");
+
+            var fileContent = new StreamContent(document.OpenReadStream(maxAllowedSize: 1500000));
+
+            content.Add(fileContent, "\"file\"", document.Name);
             request.Content = content;
             var response = await _httpClient.SendAsync(request);
             var result = response.Content.ReadAsStringAsync().Result;
