@@ -13,12 +13,13 @@ namespace HKCRSystem.Blazor.Data.Services
             _httpClient = httpClient;
         }
 
-        public async Task<List<DashboardDTO>?> GetDashboardAsync()
+        public async Task<ResponseDTO> GetDashboardAsync()
         {
-            var response = await _httpClient.GetAsync("https://localhost:7284/api/dashboard/");
+            var response = await _httpClient.GetAsync("https://localhost:7096/api/dashboard/");
 
-            var result = response.Content.ReadAsStringAsync().Result;
-            var rr = JsonConvert.DeserializeObject<List<DashboardDTO>?>(result);
+            var result = await response.Content.ReadAsStringAsync();
+            Console.WriteLine(result);
+            var rr = JsonConvert.DeserializeObject<ResponseDTO>(result);
             return rr;
         }
     }

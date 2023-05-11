@@ -19,6 +19,7 @@ builder.Services.AddScoped<RegisterService>();
 builder.Services.AddScoped<DamageService>();
 builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<UserManagementService>();
+builder.Services.AddScoped<UpdateProfileService>();
 builder.Services.AddScoped<BillingService>();
 builder.Services.AddScoped<OfferService>();
 builder.Services.AddScoped<ReturnService>();

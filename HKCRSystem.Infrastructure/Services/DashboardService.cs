@@ -26,7 +26,7 @@ namespace HKCRSystem.Infrastructure.Services
         {
             //gets total customer
             var customers = await _userManager.GetUsersInRoleAsync("Customer");
-            var count = customers.Count();
+            int count = customers.Count();
 
             //gets curent date
             var date = DateTime.UtcNow;
@@ -45,10 +45,10 @@ namespace HKCRSystem.Infrastructure.Services
             }
 
             //gets the requests that are not approved and is not cancelled
-            var pending = _dbContext.Requests.Where(r => !r.IsApproved && !r.IsCancelled && r.RequestedById == r.ApprovedById).Count();
+            int pending = _dbContext.Requests.Where(r => !r.IsApproved && !r.IsCancelled && r.RequestedById == r.ApprovedById).Count();
 
             //gets the number of damage data
-            var damage = _dbContext.Damages.Count();
+            int damage = _dbContext.Damages.Count();
 
             var Data = new
             {
