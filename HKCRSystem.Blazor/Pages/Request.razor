@@ -4,6 +4,7 @@
 @using HKCRSystem.Blazor.Data.DTO;
 @using HKCRSystem.Blazor.Data.Services
 @inject RequestService RequestService
+@inject ReturnService ReturnService
 @inject Authorize Authorize
 @inject ISnackbar Snackbar
 
@@ -24,6 +25,7 @@
             <MudTh>Requested By</MudTh>
             <MudTh>Approved By</MudTh>
             <MudTh>Is Cancelled</MudTh>
+            <MudTh>Is Denied</MudTh>
             <MudTh>Billing Id</MudTh>
             <MudTh>Actions</MudTh>
         </HeaderContent>
@@ -46,12 +48,17 @@
                 }
             </MudTd>
             <MudTd DataLabel="IsCancelled">@context.IsCancelled</MudTd>
+            <MudTd DataLabel="IsCancelled">@(context.ApprovedById != context.RequestedById && !context.IsApproved ? "True": "False")</MudTd>
             <MudTd DataLabel="BillingId">@context.BillingId</MudTd>
             <MudTd DataLabel="Actions">
                 @if (!context.IsApproved && !context.IsCancelled)
                 {
                     <MudIconButton Icon="@Icons.Material.Filled.Check" Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick=@(()=>OpenAcceptDialog(context)) aria-label="Edit" />
                     <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" OnClick=@(()=>OpenDenyDialog(context)) aria-label="delete" />
+                }
+                @if (context.IsApproved)
+                {
+                    <MudIconButton Icon="@Icons.Material.Filled.AssignmentReturn" Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick=@(()=>OpenReturnDialog(context)) aria-label="Edit" />
                 }
             </MudTd>
         </RowTemplate>
@@ -92,7 +99,20 @@
     </DialogActions>
 </MudDialog>
 
+<MudDialog @bind-IsVisible="visibleReturn" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            Are you sure you want to mark request returned by @activeRequestData.RequestedBy ?
+        </MudText>
+    </TitleContent>
+    <DialogContent>
 
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Color="Color.Info" Size="Size.Small" OnClick="handleReturnDialog">Yes</MudButton>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" Size="Size.Small" OnClick="@(() => CloseReturnDialog())">No</MudButton>
+    </DialogActions>
+</MudDialog>
 @code {
     private List<RequestData>? requestsDatas;
     //private bool FilterHandler(InventoryItem item) => SearchFilter(item, toSearch);
@@ -109,6 +129,7 @@
 
     private bool visibleAccept;
     private bool visibleDeny;
+    private bool visibleReturn;
 
     private RequestData _requestData { get; set; }
 
@@ -125,12 +146,47 @@
 
     }
 
+    private void OpenReturnDialog(RequestData requestData)
+    {
+        activeRequestData = requestData;
+        visibleReturn = true;
+    }
+
+    private void CloseReturnDialog()
+    {
+        activeRequestData = null;
+        visibleReturn = false;
+
+    }
+
     private async void handleAcceptRequest()
     {
         string message;
         Severity type;
         string token = await Authorize.GetToken();
         var result = await RequestService.AcceptRequest(token, activeRequestData.Id);
+        message = result.Message;
+
+        if (result.Status == "Success")
+        {
+            type = Severity.Success;
+        }
+        else
+        {
+            type = Severity.Warning;
+        }
+        Snackbar.Add(message, type, config => { config.ShowCloseIcon = false; config.VisibleStateDuration = 2000; config.ShowTransitionDuration = 500; config.HideTransitionDuration = 500; });
+        requestsDatas = await RequestService.GetRequestAsync(token);
+        StateHasChanged();
+        visibleAccept = false;
+    }
+
+    private async void handleReturnDialog()
+    {
+        string message;
+        Severity type;
+        string token = await Authorize.GetToken();
+        var result = await ReturnService.CreateRetun(activeRequestData.Id, token);
         message = result.Message;
 
         if (result.Status == "Success")
