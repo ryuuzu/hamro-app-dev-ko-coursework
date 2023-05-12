@@ -85,10 +85,27 @@
     {
         activeRequestData = null;
         visibleAccept = false;
-
     }
 
     private async void handleAcceptRequest()
     {
+        string token = await Authorize.GetToken();
+        var result = await BillingService.UpdateBilling(activeRequestData.BillingId, token);
+        string message;
+        Severity type;
+        message = result.Message;
+
+        if (result.Status == "Success")
+        {
+            type = Severity.Success;
+        }
+        else
+        {
+            type = Severity.Warning;
+        }
+        Snackbar.Add(message, type, config => { config.ShowCloseIcon = false; config.VisibleStateDuration = 2000; config.ShowTransitionDuration = 500; config.HideTransitionDuration = 500; });
+        salesDatas = await BillingService.GetSalesAsync(token);
+        visibleAccept = false;
+        StateHasChanged();
     }
 }

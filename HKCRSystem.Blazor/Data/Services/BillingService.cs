@@ -33,7 +33,7 @@ namespace HKCRSystem.Blazor.Data.Services
             return rr;
         }
 
-        public async Task<ResponseDTO> UpdateBilling(string billingId, string token)
+        public async Task<ResponseDTO> UpdateBilling(Guid billingId, string token)
         {
             var request =
                 new HttpRequestMessage(HttpMethod.Put, $"https://localhost:7096/api/update/billing/{billingId}");
@@ -42,7 +42,8 @@ namespace HKCRSystem.Blazor.Data.Services
             response.EnsureSuccessStatusCode();
             var result = await response.Content.ReadAsStringAsync();
 
-            return new ResponseDTO { Status = "Success", Message = result };
+            var rr = JsonConvert.DeserializeObject<ResponseDTO>(result);
+            return rr;
         }
 
         public async Task<List<BillingData>?> GetBillingAsync()
