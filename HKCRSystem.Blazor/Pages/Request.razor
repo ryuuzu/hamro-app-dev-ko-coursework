@@ -4,6 +4,7 @@
 @using HKCRSystem.Blazor.Data.DTO;
 @using HKCRSystem.Blazor.Data.Services
 @inject RequestService RequestService
+@inject Authorize Authorize
 @inject ISnackbar Snackbar
 
 <PageTitle>Request</PageTitle>
@@ -33,12 +34,25 @@
             <MudTd DataLabel="StartDate">@context.StartDate.ToString("MM/dd/yyyy")</MudTd>
             <MudTd DataLabel="EndDate">@context.EndDate.ToString("MM/dd/yyyy")</MudTd>
             <MudTd DataLabel="RequestedBy">@context.RequestedBy</MudTd>
-            <MudTd DataLabel="ApprovedBy">@context.ApprovedBy</MudTd>
+
+            <MudTd DataLabel="ApprovedBy">
+                @if (context.IsApproved)
+                {
+                    @context.ApprovedBy
+                }
+                else
+                {
+                    <MudText>N/A</MudText>
+                }
+            </MudTd>
             <MudTd DataLabel="IsCancelled">@context.IsCancelled</MudTd>
             <MudTd DataLabel="BillingId">@context.BillingId</MudTd>
             <MudTd DataLabel="Actions">
-                <MudIconButton Icon="@Icons.Material.Filled.Check" Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick=@(()=>OpenDialogEdit(context)) aria-label="Edit"></MudIconButton>
-                <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" aria-label="delete" />
+                @if (!context.IsApproved && !context.IsCancelled)
+                {
+                    <MudIconButton Icon="@Icons.Material.Filled.Check" Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick=@(()=>OpenAcceptDialog(context)) aria-label="Edit" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" OnClick=@(()=>OpenDenyDialog(context)) aria-label="delete" />
+                }
             </MudTd>
         </RowTemplate>
         <PagerContent>
@@ -48,21 +62,35 @@
 </MudContainer>
 
 
-<MudDialog @bind-IsVisible="visibleEdit" Options="dialogOptions">
+<MudDialog @bind-IsVisible="visibleAccept" Options="dialogOptions">
     <TitleContent>
         <MudText Typo="Typo.h6">
-            <MudIcon Icon="@Icons.Material.Filled.Person" Class="mr-3" /> Edit Staff
+            Are you sure you want to accept request by @activeRequestData.RequestedBy ?
         </MudText>
     </TitleContent>
     <DialogContent>
-       
+
     </DialogContent>
     <DialogActions>
-        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Color="Color.Info" Size="Size.Small" OnClick="SubmitEdit">Save</MudButton>
-        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" Size="Size.Small" OnClick="CloseEdit">Close</MudButton>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Color="Color.Info" Size="Size.Small" OnClick="handleAcceptRequest">Yes</MudButton>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" Size="Size.Small" OnClick="@(() => CloseAcceptDialog())">No</MudButton>
     </DialogActions>
 </MudDialog>
 
+<MudDialog @bind-IsVisible="visibleDeny" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            Are you sure you want to deny request by @activeRequestData.RequestedBy ?
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Color="Color.Info" Size="Size.Small" OnClick="handleDenyRequest">Yes</MudButton>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" Size="Size.Small" OnClick="@(() => CloseDenyDialog())">No</MudButton>
+    </DialogActions>
+</MudDialog>
 
 
 @code {
@@ -70,23 +98,89 @@
     //private bool FilterHandler(InventoryItem item) => SearchFilter(item, toSearch);
     protected override async Task OnInitializedAsync()
     {
-        requestsDatas = await RequestService.GetRequestAsync();
+        string token = await Authorize.GetToken();
+        requestsDatas = await RequestService.GetRequestAsync(token);
     }
 
     private bool visibleAdd;
     private bool visibleEdit;
 
+    private RequestData activeRequestData;
+
+    private bool visibleAccept;
+    private bool visibleDeny;
+
     private RequestData _requestData { get; set; }
 
-    
-
-    private void OpenDialogEdit(RequestData requestData)
+    private void OpenAcceptDialog(RequestData requestData)
     {
-        _requestData = requestData;
-        visibleEdit = true;
+        activeRequestData = requestData;
+        visibleAccept = true;
     }
 
-   
+    private void CloseAcceptDialog()
+    {
+        activeRequestData = null;
+        visibleAccept = false;
+
+    }
+
+    private async void handleAcceptRequest()
+    {
+        string message;
+        Severity type;
+        string token = await Authorize.GetToken();
+        var result = await RequestService.AcceptRequest(token, activeRequestData.Id);
+        message = result.Message;
+
+        if (result.Status == "Success")
+        {
+            type = Severity.Success;
+        }
+        else
+        {
+            type = Severity.Warning;
+        }
+        Snackbar.Add(message, type, config => { config.ShowCloseIcon = false; config.VisibleStateDuration = 2000; config.ShowTransitionDuration = 500; config.HideTransitionDuration = 500; });
+        requestsDatas = await RequestService.GetRequestAsync(token);
+        StateHasChanged();
+        visibleAccept = false;
+    }
+
+    private void OpenDenyDialog(RequestData requestData)
+    {
+        activeRequestData = requestData;
+        visibleDeny = true;
+    }
+    private void CloseDenyDialog()
+    {
+        activeRequestData = null;
+        visibleDeny = false;
+
+    }
+    private async void handleDenyRequest()
+    {
+        string message;
+        Severity type;
+        string token = await Authorize.GetToken();
+        var result = await RequestService.DenyRequest(token, activeRequestData.Id);
+        message = result.Message;
+
+        if (result.Status == "Success")
+        {
+            type = Severity.Success;
+        }
+        else
+        {
+            type = Severity.Warning;
+        }
+        Snackbar.Add(message, type, config => { config.ShowCloseIcon = false; config.VisibleStateDuration = 2000; config.ShowTransitionDuration = 500; config.HideTransitionDuration = 500; });
+        requestsDatas = await RequestService.GetRequestAsync(token);
+        StateHasChanged();
+        visibleAccept = false;
+    }
+
+
     void CloseEdit() => visibleEdit = false;
 
     void SubmitAdd() => visibleAdd = false;
@@ -102,4 +196,3 @@
     }
 }
 
-  

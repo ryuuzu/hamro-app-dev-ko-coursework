@@ -143,7 +143,7 @@ public class RequestService : IRequest
     public async Task<ResponseDTO> CreateRequest(RequestRequestDTO model, string UserId)
     {
         var user = await _userManager.FindByIdAsync(UserId);
-        var userAttachment = await _dbContext.Attachments.FindAsync(Guid.Parse(UserId));
+        var userAttachment = await _dbContext.Attachments.FirstOrDefaultAsync(attachment => attachment.UserId == UserId);
         var requests = await _dbContext.Requests.ToListAsync();
         // var returns = await _dbContext.Returns
         //     .Include(r => r.Request.RequestedBy)

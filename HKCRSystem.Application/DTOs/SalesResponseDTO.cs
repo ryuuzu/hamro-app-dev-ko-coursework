@@ -2,6 +2,7 @@
 
 public class SalesResponseDTO
 {
+    public Guid BillingId { get; set; }
     public string Customer { get; set; }
     public string SalesHandledBy { get; set; }
     public string CarName { get; set; }
