@@ -29,6 +29,7 @@ public class BillingService : IBilling
         var salesModel = new List<SalesResponseDTO>(
             requests.Where(r => r.IsApproved && !r.IsCancelled).Select(r => new SalesResponseDTO
             {
+                BillingId = r.BillingId,
                 Customer = $"{r.RequestedBy.FirstName} {r.RequestedBy.LastName}",
                 SalesHandledBy = $"{r.ApprovedBy.FirstName} {r.ApprovedBy.LastName}",
                 CarName = $"{r.RequestedCar.Company} {r.RequestedCar.Model}",

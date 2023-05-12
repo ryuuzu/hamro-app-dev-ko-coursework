@@ -4,27 +4,39 @@
 @using HKCRSystem.Blazor.Data.Services
 @inject BillingService BillingService
 @inject ISnackbar Snackbar
+@inject Authorize Authorize
 
 <PageTitle>Billing</PageTitle>
 
 <MudContainer Class="mt-8 position-relative">
-    <MudTable FixedHeader="true" FixedFooter="true" Height="450px" Items="@billingsDatas" Hover="true" Striped="false">
+    <MudTable FixedHeader="true" FixedFooter="true" Height="450px" Items="@salesDatas" Hover="true" Striped="false">
         <ToolBarContent>
             <MudText Typo="Typo.h6">Billing</MudText>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh><MudTableSortLabel SortBy="new Func<BillingData, object>(BillData => BillData.Id)">ID</MudTableSortLabel></MudTh>
+            <MudTh>Customer</MudTh>
+            <MudTh>Handled By</MudTh>
+            <MudTh>Rented Car</MudTh>
             <MudTh>Total Price</MudTh>
             <MudTh>Payment Type</MudTh>
             <MudTh>IsPaid</MudTh>
-            <MudTh>Advance Payment</MudTh>
+            <MudTh>Sales Date</MudTh>
+            <MudTh>Actions</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="ID">@context.Id</MudTd>
+            <MudTd DataLabel="Customer">@context.Customer</MudTd>
+            <MudTd DataLabel="Handled By">@context.SalesHandledBy</MudTd>
+            <MudTd DataLabel="Rented Car">@context.CarName</MudTd>
             <MudTd DataLabel="TotalPrice">@context.TotalPrice</MudTd>
             <MudTd DataLabel="PaymentType">@context.PaymentType</MudTd>
+            <MudTd DataLabel="Sales Date">@context.SalesDate</MudTd>
             <MudTd DataLabel="IsPaid">@context.IsPaid</MudTd>
-            <MudTd DataLabel="AdvancedPayment">@context.AdvancePayment</MudTd>
+            <MudTd DataLabel="Actions">
+                @if (!context.IsPaid)
+                {
+                    <MudIconButton Icon="@Icons.Material.Filled.Check" Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick=@(()=>OpenAcceptDialog(context)) aria-label="Edit" />
+                }
+            </MudTd>
         </RowTemplate>
         <PagerContent>
             <MudTablePager />
@@ -33,14 +45,50 @@
 
 </MudContainer>
 
+<MudDialog @bind-IsVisible="visibleAccept">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            Are you sure you want to update sales to @activeRequestData.Customer ?
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Color="Color.Info" Size="Size.Small" OnClick="handleAcceptRequest">Yes</MudButton>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" Size="Size.Small" OnClick="@(() => CloseAcceptDialog())">No</MudButton>
+    </DialogActions>
+</MudDialog>
 
 @code {
     // Global State of the Application
 
-    private List<BillingData>? billingsDatas;
+    private List<SalesData>? salesDatas;
     //private bool FilterHandler(InventoryItem item) => SearchFilter(item, toSearch);
+    private SalesData activeRequestData;
+
+    private bool visibleAccept;
     protected override async Task OnInitializedAsync()
     {
-        billingsDatas = await BillingService.GetBillingAsync();
+        string token = await Authorize.GetToken();
+        salesDatas = await BillingService.GetSalesAsync(token);
+    }
+
+
+    private void OpenAcceptDialog(SalesData requestData)
+    {
+        activeRequestData = requestData;
+        visibleAccept = true;
+    }
+
+    private void CloseAcceptDialog()
+    {
+        activeRequestData = null;
+        visibleAccept = false;
+
+    }
+
+    private async void handleAcceptRequest()
+    {
     }
 }
