@@ -52,7 +52,7 @@ namespace HKCRSystem.Infrastructure.Services
             //creates damage instance
             var damageDetail = new Damage
             {
-                DamageDate = model.DamageDate,
+                DamageDate = model.DamageDate.ToUniversalTime(),
                 Description = model.Description,
                 RequestId = model.RequestId,
                 BillingId = billingEntity.Entity.Id,
@@ -157,7 +157,7 @@ namespace HKCRSystem.Infrastructure.Services
                     thisViewModel.RequestedBy = $"{requestedBy.FirstName} {requestedBy.LastName}";
                     thisViewModel.ReportedDate = damage.CreatedTime;
                     thisViewModel.DamagedCar = $"{damage.Request.RequestedCar.Company} {damage.Request.RequestedCar.Model}";
-                    thisViewModel.ReviewedBy = $"{reviewedBy.FirstName} {reviewedBy.LastName}";
+                    thisViewModel.ReviewedBy = (damage.UpdatedBy != Guid.Parse("00000000-0000-0000-0000-000000000000") ? $"{reviewedBy.FirstName} {reviewedBy.LastName}" : "-");
                     thisViewModel.Price = damage.Billing.TotalPrice;
 
                     damageViewModel.Add(thisViewModel);

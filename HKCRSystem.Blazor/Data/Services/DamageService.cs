@@ -17,21 +17,29 @@ namespace HKCRSystem.Blazor.Data.Services
             _httpClient = httpClient;
         }
 
-        public async Task<ResponseDTO> CreateDamage(string requestId, string description, string damageDate,
+        public async Task<ResponseDTO> CreateDamage(Guid requestId, string description, DateTime? damageDate,
             string token)
         {
             var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:7096/api/add/damage");
             request.Headers.Add("Authorization", $"Bearer {token}");
-            var content = new MultipartFormDataContent();
-            content.Add(new StringContent(requestId), "requestId");
-            content.Add(new StringContent(description), "description");
-            content.Add(new StringContent(damageDate), "damageDate");
-            request.Content = content;
-            var response = await _httpClient.SendAsync(request);
-            response.EnsureSuccessStatusCode();
-            var result = await response.Content.ReadAsStringAsync();
+            var data = new
+            {
+                RequestId = requestId,
+                Description = description,
+                DamageDate = damageDate,
+            };
 
-            return new ResponseDTO { Status = "Success", Message = result };
+            var json = JsonConvert.SerializeObject(data);
+            request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.SendAsync(request);
+            if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                return null;
+            }
+            var result = await response.Content.ReadAsStringAsync();
+            var resulta = JsonConvert.DeserializeObject<ResponseDTO>(result);
+            return resulta;
         }
 
         public async Task<List<DamageData>?> GetDamageAsync(string token)

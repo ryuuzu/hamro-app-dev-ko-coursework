@@ -6,6 +6,7 @@
 @using Newtonsoft.Json
 @inject RequestCustomerService RequestCustomerService
 @inject CarRequestService CarRequestService
+@inject DamageService DamageService
 @inject ISnackbar Snackbar
 @inject Authorize Authorize
 @inject NavigationManager NavManager
@@ -47,8 +48,9 @@
                 {
                     <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" aria-label="delete" OnClick="() => CancelRequest(context.Id)"/>
                 }
-                @if (context.IsApproved)
+                @if (!context.IsApproved)
                 {
+                    <MudIconButton Icon="@Icons.Material.Filled.Pages" Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" aria-label="delete" OnClick="() => OpenForm(context.Id)" />
                     <MudIconButton Icon="@Icons.Material.Filled.Payment" Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" aria-label="delete" OnClick="() => MakePayment(context.BillingId)" />
                 }
             </MudTd>
@@ -59,13 +61,38 @@
     </MudTable>
 </MudContainer>
 
+<MudDialog @bind-IsVisible="visibleAdd" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.RequestPage" Class="mr-3" /> Damage Form
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudGrid>
+            <MudItem xs="6">
+                <MudDatePicker @bind-Date="DamageDate" Label="Damage Date" Variant="Variant.Outlined" />
+            </MudItem>
+            <MudItem xs="12">
+                <MudTextField @bind-Value="Description" Label="Description" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+        </MudGrid>
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Color="Color.Info" Size="Size.Small" OnClick="SubmitForm">Save</MudButton>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel" Color="Color.Error" Size="Size.Small" OnClick="CloseForm">Close</MudButton>
+    </DialogActions>
+</MudDialog>
 @code {
     private string token;
     private bool visibleAdd;
-    private bool visibleEdit;
+    private DateTime? DamageDate { get; set; }
+    private Guid requestId;
+    private string Description;
 
     private string message;
     private Severity type;
+
     private List<RequestDTO>? requestsDatas = new List<RequestDTO>();
     private RequestDTO _carRequest { get; set; }
 
@@ -79,11 +106,12 @@
         requestsDatas = await RequestCustomerService.GetRequestCustomerAsync(token);
     }
 
-    private void OpenDialogEdit(RequestDTO carrequest)
+    private void OpenForm(Guid id)
     {
-        _carRequest = carrequest;
-        visibleEdit = true;
+        visibleAdd = true;
+        requestId = id;
     }
+    void CloseForm() => visibleAdd = false;
 
     private async void CancelRequest(Guid id)
     {
@@ -137,4 +165,34 @@
         }
         Snackbar.Add(message, type, config => { config.ShowCloseIcon = false; config.VisibleStateDuration = 2000; config.ShowTransitionDuration = 500; config.HideTransitionDuration = 500; });
     }
-  }
+
+    public async void SubmitForm()
+    {
+        visibleAdd = false;
+        string message;
+        Severity type;
+        string token = await Authorize.GetToken();
+        var result = await DamageService.CreateDamage(requestId, Description, DamageDate, token);
+
+        if (result == null)
+        {
+            await Authorize.Logout();
+            message = "Session Expired. Please Login.";
+            type = Severity.Warning;
+            NavManager.NavigateTo("/login", forceLoad: true);
+        }
+        else if (result.Status == "Success")
+        {
+            message = result.Message;
+            type = Severity.Success;
+        }
+        else
+        {
+            message = result.Message;
+            type = Severity.Warning;
+        }
+        Snackbar.Add(message, type, config => { config.ShowCloseIcon = false; config.VisibleStateDuration = 2000; config.ShowTransitionDuration = 500; config.HideTransitionDuration = 500; });
+    }
+
+    private DialogOptions dialogOptions = new() { FullWidth = true };
+}
