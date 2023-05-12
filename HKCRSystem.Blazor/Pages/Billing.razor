@@ -18,6 +18,7 @@
             <MudTh>Handled By</MudTh>
             <MudTh>Rented Car</MudTh>
             <MudTh>Total Price</MudTh>
+            <MudTh>Advance</MudTh>
             <MudTh>Payment Type</MudTh>
             <MudTh>IsPaid</MudTh>
             <MudTh>Sales Date</MudTh>
@@ -28,9 +29,10 @@
             <MudTd DataLabel="Handled By">@context.SalesHandledBy</MudTd>
             <MudTd DataLabel="Rented Car">@context.CarName</MudTd>
             <MudTd DataLabel="TotalPrice">@context.TotalPrice</MudTd>
+            <MudTd DataLabel="Advance">@context.AdvancePayment</MudTd>
             <MudTd DataLabel="PaymentType">@context.PaymentType</MudTd>
-            <MudTd DataLabel="Sales Date">@context.SalesDate</MudTd>
             <MudTd DataLabel="IsPaid">@context.IsPaid</MudTd>
+            <MudTd DataLabel="Sales Date">@context.SalesDate</MudTd>
             <MudTd DataLabel="Actions">
                 @if (!context.IsPaid)
                 {

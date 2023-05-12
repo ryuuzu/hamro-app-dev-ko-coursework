@@ -34,6 +34,7 @@ public class BillingService : IBilling
                 SalesHandledBy = $"{r.ApprovedBy.FirstName} {r.ApprovedBy.LastName}",
                 CarName = $"{r.RequestedCar.Company} {r.RequestedCar.Model}",
                 TotalPrice = r.Billing.TotalPrice,
+                AdvancePayment = r.Billing.AdvancePayment,
                 PaymentType = r.Billing.PaymentType,
                 SalesDate = r.StartDate,
                 IsPaid = r.Billing.IsPaid

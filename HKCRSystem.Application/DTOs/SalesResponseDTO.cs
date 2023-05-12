@@ -7,6 +7,7 @@ public class SalesResponseDTO
     public string SalesHandledBy { get; set; }
     public string CarName { get; set; }
     public double TotalPrice { get; set; }
+    public double AdvancePayment { get; set; }
     public string PaymentType { get; set; }
     public DateTime SalesDate { get; set; }
     public bool IsPaid { get; set; }

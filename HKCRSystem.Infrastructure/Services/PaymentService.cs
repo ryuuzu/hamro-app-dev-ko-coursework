@@ -53,12 +53,13 @@ namespace HKCRSystem.Infrastructure.Services
             var url = _configuration.GetSection("App:ApiBaseUrl").Value!;
 
             //gets the price 
-            float price = (float)((10f / 100) * billing.TotalPrice); 
-            //if price is less than 10 sets to 10
-            if (price < 10)
-            {
-                price = 10;
-            }
+            //float price = (float)((10f / 100) * billing.TotalPrice); 
+            ////if price is less than 10 sets to 10
+            //if (price < 10)
+            //{
+            //    price = 10;
+            //}
+            int price = 10;
             //data for Khalti
             var data = new
             {
@@ -79,6 +80,7 @@ namespace HKCRSystem.Infrastructure.Services
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Key", "a503a109720a45f48c8a49434deb5101");
             //hitting Post request
             var response = await client.PostAsJsonAsync("https://a.khalti.com/api/v2/epayment/initiate/", data);
+            Console.WriteLine(await response.Content.ReadAsStringAsync());
             //validates the repsonse of khalti
             if (response.IsSuccessStatusCode)
             {
