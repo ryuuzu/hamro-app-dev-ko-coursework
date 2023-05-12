@@ -113,14 +113,6 @@
 
         [Required]
         public string Address { get; set; }
-
-        [Required]
-        [StringLength(30, ErrorMessage = "Password must be at least 8 characters long.", MinimumLength = 8)]
-        public string Password { get; set; }
-
-        [Required]
-        [Compare(nameof(Password))]
-        public string Password2 { get; set; }
     }
 
     IBrowserFile document;
@@ -134,6 +126,7 @@
 
     private async void OnValidSubmit(EditContext context)
     {
+        Console.WriteLine("aa");
         string accessToken = await localStore.GetItemAsync<string>("access");
         var result = UpdateProfileService.UpdateUserProfile(
             accessToken,

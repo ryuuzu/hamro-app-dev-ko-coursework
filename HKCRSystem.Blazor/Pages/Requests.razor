@@ -48,7 +48,7 @@
                 {
                     <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" aria-label="delete" OnClick="() => CancelRequest(context.Id)"/>
                 }
-                @if (!context.IsApproved)
+                @if (context.IsApproved)
                 {
                     <MudIconButton Icon="@Icons.Material.Filled.Pages" Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" aria-label="delete" OnClick="() => OpenForm(context.Id)" />
                     <MudIconButton Icon="@Icons.Material.Filled.Payment" Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" aria-label="delete" OnClick="() => MakePayment(context.BillingId)" />

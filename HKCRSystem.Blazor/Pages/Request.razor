@@ -200,7 +200,7 @@
         Snackbar.Add(message, type, config => { config.ShowCloseIcon = false; config.VisibleStateDuration = 2000; config.ShowTransitionDuration = 500; config.HideTransitionDuration = 500; });
         requestsDatas = await RequestService.GetRequestAsync(token);
         StateHasChanged();
-        visibleAccept = false;
+        visibleReturn = false;
     }
 
     private void OpenDenyDialog(RequestData requestData)
