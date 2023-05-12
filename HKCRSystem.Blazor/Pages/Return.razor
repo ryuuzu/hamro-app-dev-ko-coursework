@@ -5,6 +5,8 @@
 @using HKCRSystem.Blazor.Data.Services
 @inject ReturnService ReturnService
 @inject ISnackbar Snackbar
+@inject Authorize Authorize
+@inject NavigationManager NavManager
 
 <PageTitle>return</PageTitle>
 
@@ -19,11 +21,11 @@
             <MudText Typo="Typo.h6">Return</MudText>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh><MudTableSortLabel SortBy="new Func<ReturnData, object>(ReturnData => ReturnData.RequestId)">RequestID</MudTableSortLabel></MudTh>
-            <MudTh>AcceptedBy</MudTh>
-            <MudTh>ReturnDate</MudTh>
-            <MudTh>CarName</MudTh>
-            <MudTh>UserName</MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<ReturnData, object>(ReturnData => ReturnData.RequestId)">Request ID</MudTableSortLabel></MudTh>
+            <MudTh>Car Name</MudTh>
+            <MudTh>User Name</MudTh>
+            <MudTh>Return Date</MudTh>
+            <MudTh>Entry By</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="RequestId">@context.RequestId</MudTd>
@@ -73,10 +75,11 @@
 
 @code {
     private List<ReturnData>? returnsDatas;
-    //private bool FilterHandler(InventoryItem item) => SearchFilter(item, toSearch);
+
     protected override async Task OnInitializedAsync()
     {
-         returnsDatas = await ReturnService.GetReturnAsync();
+        string token = await Authorize.GetToken();
+        returnsDatas = await ReturnService.GetReturnAsync(token);
     }
 
     private bool visibleAdd;
